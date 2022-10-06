@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table id="data" class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>License Plate</th>
+            <th>Brand</th>
+            <th>Image</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.0 }}</td>
+            <td>{{ row.1 }}</td>
+            <td>{{ row.2 }}</td>
+            <td><a href="upload/{{ row.3 }}" data-featherlight><img src="upload/{{ row. 3}}" width="70%"></a>
+            </td>
+
+            <!-- <td>{{ row.3 }}</td> -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#data').DataTable({
+            // columns: [
+            //     null,
+            //     { searchable: false },
+            //     { orderable: false, searchable: false },
+            //     { orderable: false, searchable: false },
+            //     null],
+        });
+    });
+</script>
+{% endblock %}

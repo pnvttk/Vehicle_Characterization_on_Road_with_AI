@@ -1,0 +1,6 @@
+/flask_env/*
+/flask_wenv/*
+/__pycache__/*
+**/yolov5/**
+/yolov5/*
+/models_train/*
