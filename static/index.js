@@ -2,6 +2,7 @@ window.onload = () => {
     $('#sendbutton').click(() => {
         imagebox = $('#imagebox')
         abox = $('#abox')
+        text_a = $('#ocr_txt')
         input = $('#imageinput')[0]
         if (input.files && input.files[0]) {
             let formData = new FormData();
@@ -22,11 +23,27 @@ window.onload = () => {
                     console.log(data);
                     a_msg = data['alert']
                     bytestring = data['status']
+                    ocr_txt = data['ocr_txt']
                     // console.log("a_msg : ", a_msg)
                     // console.log("bytestring : ", bytestring)
+                    console.log("ocr_txt : ", ocr_txt)
                     if (bytestring != undefined) {
-                        temp_image_path = data['temp_image']
-                        console.log("temp_image_path :", temp_image_path)
+                        // temp_image_path = data['temp_image']
+                        // console.log("temp_image_path :", temp_image_path)
+                        // ocr_txt.split(',').join('\n');
+
+                        new_arr = []
+                        ocr_txt.forEach(plate => {
+                            for (let key in plate) {
+                                // console.log(`${key}: ${plate[key]}`)
+                                new_arr.push(`${plate[key]}`)
+                            }
+                        })
+
+                        result_arr = new_arr.toString().split(",").join("\n")
+                        // console.log(result_arr)
+                        text_a.val(result_arr)
+                        // text_a.val(JSON.stringify(ocr_txt))
                         abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
                         imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
                         alert('Object detection success.')
