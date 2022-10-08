@@ -30,8 +30,16 @@ window.onload = () => {
                     if (bytestring != undefined) {
                         // temp_image_path = data['temp_image']
                         // console.log("temp_image_path :", temp_image_path)
-                        // ocr_txt.split(',').join('\n');
-
+                        abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
+                        imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
+                        // alert('Object detection success.')
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Successfully',
+                            text: 'Obejct Detection have been compleate!',
+                        })
+                    }
+                    if (ocr_txt != undefined) {
                         new_arr = []
                         ocr_txt.forEach(plate => {
                             for (let key in plate) {
@@ -44,12 +52,14 @@ window.onload = () => {
                         // console.log(result_arr)
                         text_a.val(result_arr)
                         // text_a.val(JSON.stringify(ocr_txt))
-                        abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
-                        imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
-                        alert('Object detection success.')
                     }
                     if (a_msg != undefined) {
-                        alert("Error : Cannot detect Plate or Brand from this image.")
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: "Object Detection have been failed! \n Look like there isn't Plate or Brand in this image",
+                        })
+                        // alert("Error : Cannot detect Plate or Brand from this image.")
                     }
                 }
             });
