@@ -24,19 +24,20 @@ import pathlib
 
 from werkzeug.utils import secure_filename
 
+app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
 # DEFINING GLOBAL VARIABLE
 EASY_OCR = easyocr.Reader(['th'])  # initiating easyocr
 OCR_TH = 0.2
 
+# Define path
 UPLOAD_FOLDER = './results'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-
-app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
-
-# upload folder
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+# ? MySQL setup
 conn = pymysql.connect(host='localhost',
                        user='root',
                        passwd='',
@@ -44,15 +45,12 @@ conn = pymysql.connect(host='localhost',
                        #    cursorclass=pymysql.cursors.DictCursor
                        )
 
+
 # ? Local custom model
 model = torch.hub.load('./yolov5', 'custom', source='local',
                        path='./models_train/yolov5x.pt', force_reload=True)  # The repo is stored locally
-
 # ? all classname
 classes = model.names  # class names in string format
-# print(classes[0])
-# quit()
-
 # ? confidence threshold
 model.conf = 0.8
 
@@ -60,6 +58,7 @@ model.conf = 0.8
 # # ! testing
 # @app.route("/fetcg")
 # def hello_world():
+#
 #     cur = conn.cursor()
 #     cur.execute('select * from student')
 #     rows = cur.fetchall()
@@ -69,16 +68,16 @@ model.conf = 0.8
 # # ? datatables
 @app.route("/dttb")
 def dttb():
+
     cur = conn.cursor()
     cur.execute('select * from detect_data')
     tb_detect_data = cur.fetchall()
     return render_template('dttb.html', title='datatables', data=tb_detect_data)
-# img_base64 = ""
+
 
 # ? Unique name generate
-
-
 def generate_custom_name(original_file_name):
+
     unique_name = uuid.uuid4().hex
     return unique_name
     # return unique_name + pathlib.Path(original_file_name).suffix
@@ -87,12 +86,14 @@ def generate_custom_name(original_file_name):
 # ? Main Yolov5 Object Detection
 @app.route('/detectObject', methods=['GET', 'POST'])
 def mask_image():
+
     # ? Get image from POST
     file = request.files["image"]
 
+    # ? Create temp unique directory
     new_name = generate_custom_name(file.filename)
 
-    # ? Pass img to model
+    # ? Send img to model
     img_bytes = file.read()
     img = Image.open(io.BytesIO(img_bytes))
     results = model([img])
@@ -102,7 +103,7 @@ def mask_image():
     # results.save(save_dir="results/" + new_name)
     # results.save(save_dir="results/test.jpg")
 
-    # ? Count class number
+    # ? Count class number from detection
     results.pandas().xyxy[0]  # Pandas DataFrame
     print("[INFO] : Pandas Results")
     print(results.pandas().xyxy[0])
@@ -111,80 +112,73 @@ def mask_image():
     print(results.pandas().xyxy[0].value_counts(
         'name'))  # class counts (pandas)
 
-    # ? Get access to class name
+    # # Get access to class name
     # ? info for array of results
     info = results.pandas().xyxy[0].to_dict(orient='records')
+
+    # ? if results have any detection object.
     # ? Loop to get only class name
-    i = 0
+    ocr_txt = []
     if len(info) != 0:
+
         # print("[INFO] : results name")
         # print(info)
+        i = 0
         for result in info:
-            getClass_name = result['name']
-            # left = result['xmin']
-            # top = result['ymin']
-            # right = result['xmax']
-            # bottom = result['ymax']
-            # # print(getClass_name)
-            # print('[LEFT] = ', left)
-            # print('[top] = ', top)
-            # print('[right] = ', right)
-            # print('[bottom] = ', bottom)
 
-            # crop
+            # ? Get class name from for loop
+            getClass_name = result['name']
+
+            # ? If class == Plate crop image for EasyOCR
             if getClass_name == 'Plate':
+
                 print('[INFO] Croping image.')
-                # crops = results.crop((left, top, right, bottom))
-                # crops.show()
+
+                # ? crop plate and save in unique directory
                 # crops = results.crop(save=True)
                 results.crop(save_dir="results/" + new_name)
-                image_temp_path = "/results/" + new_name + "/image0.jpg"
+
+                # ? temp crop path to access to crop image
                 crop_path = new_name + '/crops/Plate/'
 
+                # ? loop to check new directory
                 for f in os.listdir("./results/"):
                     print("[TEMP PATH] = "+f)
-                    # img_ocr = open('/' + crop_path + 'image' + str(i) + '.jpg')
 
+                # ? path of image to use for easyocr
                 img_ocr = str("./results/" + crop_path +
                               'image' + str(i) + '.jpg')
+
                 print("[INFO] path for ocr")
                 print(img_ocr)
-                # os.path.exists(img_ocr)
-                # os.path.isfile(img_ocr)
-                # os.listdir(img_ocr)
+
+                # ? Extract text from Plate image
                 eOCR = EASY_OCR.readtext(str(img_ocr), detail=0)
+
+                ocr_txt.append(eOCR)
                 print(eOCR)
+
+                # ? add 1 i = 1
                 i = int(i)+1
-                print(i)
+                # print(i)
+
+            # ? because image1 not exist
+            # ? add 1 i = 2
             if i == 1:
                 i += 1
-                print(i)
-                i = str(i).zfill(2)
-                print(str(i))
-            # break
+            # print(i)
+            #  ? then add 0 in front of i => i = 02
+            i = str(i).zfill(2)
+            # print(str(i))
+
+    # ? if results not detect any thing
     else:
-        image_temp_path = ""
+        # ? return alert msg to ajax
         return jsonify({'alert': "alert('error')"})
 
-    # img_ocr.show()
+    print("last check : ", ocr_txt)
 
-    # # ? Crop results
-    # # results = model(img)  # inference
-    # if getClass_name == 'Plate':
-    #     print('[INFO] Croping image.')
-    #     crops = results.crop(save=True)
-    # # crops.save(save_dir="results/")
-    # # quit()
-
-    # results.save(save_dir="results/")
-    # return redirect("results/image0.jpg")
-
-    # print(results.ims)
-    # return jsonify({'status': str(result.ims)})
-    # quit()
-    # main(results.ims)
-
-    # ? Img to B64
+    # ? make image to base64 then send to ajax
     for img in results.ims:
         buffered = BytesIO()
         img_base64 = Image.fromarray(img)
@@ -192,8 +186,7 @@ def mask_image():
         b64str = (base64.b64encode(buffered.getvalue()).decode(
             'utf-8'))  # base64 encoded image with results
 
-    # ? Send to console
-    return jsonify({'status': str(b64str), 'temp_image': str(image_temp_path)})
+    return jsonify({'status': str(b64str), 'ocr_txt': ocr_txt})
 
 
 # ? Set Header
@@ -207,11 +200,13 @@ def after_request(response):
     return response
 
 
+# ? Root path
 @ app.route("/", methods=['GET', 'POST'])
 def new():
     return render_template('new.html')
 
 
+# ? server and port setup
 if __name__ == "__main__":
     # ? Set port
     parser = argparse.ArgumentParser(

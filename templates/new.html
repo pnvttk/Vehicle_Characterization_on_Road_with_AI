@@ -74,7 +74,7 @@
     </header>
 
     <div class="p-5 mb-4 bg-light rounded-3">
-        <div class="container-fluid py-5">
+        <div class="container-fluid py-3">
             <h1 class="display-5 fw-bold">Object Detection</h1>
             <p class="col-md-8 fs-4">Upload image to use custom model of Yolov5 model.</p>
             <form method="post" enctype=multipart/form-data>
@@ -106,8 +106,12 @@
         <div class="col-md-6">
             <div class="h-100 p-5 text-white bg-dark rounded-3">
                 <h2>EasyOCR</h2>
-                <p>Swap the background-color utility and add a `.text-*` color utility to mix up the jumbotron
-                    look. Then, mix and match with additional component themes and more.</p>
+                <p>Ready-to-use OCR with 80+ supported languages and all popular writing scripts including Latin,
+                    Chinese, Arabic, Devanagari, Cyrillic and etc.</p>
+                <div class="mb-3">
+                    <label for="ocr_txt" class="form-label">Detection text is here!</label>
+                    <textarea class="form-control" id="ocr_txt" rows="3" style="white-space: pre-wrap;"></textarea>
+                </div>
                 <button class="btn btn-outline-light" type="button">Example button</button>
             </div>
         </div>
