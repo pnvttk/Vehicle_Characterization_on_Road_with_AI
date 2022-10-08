@@ -24,9 +24,15 @@
 .pre_img {
     /* height: 600px; */
     align-content: center;
-    width: 600px;
+    width: 100%;
 }
 
+.image_responsive {
+    width: 100%;
+    display: block;
+    height: auto;
+
+}
 
 /* input[type=file] {
     background-color: #4CAF50;

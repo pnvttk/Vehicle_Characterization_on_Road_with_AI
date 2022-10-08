@@ -56,6 +56,9 @@
 </style>
 {% endblock %}
 
+
+
+
 {% block content %}
 <div class="container py-4">
     <header class="pb-3 mb-4 border-bottom">
@@ -84,8 +87,17 @@
                     <!-- <button class="btn btn-primary" type="submit">Detect</button> -->
                 </div>
             </form>
+            {% for message in get_flashed_messages() %}
+            <h2>{{ message }}</h2>
+            {% endfor %}
             <div className="pre_img" class="mt-3 d-flex justify-content-center">
-                <span><img id="imagebox" src=""></span>
+                <!-- <span> -->
+                <div class="text-center">
+                    <a href="" id="abox" data-featherlight="image">
+                        <img id="imagebox" src="" class="img_responsive" style="width: 80% ; height:auto;">
+                    </a>
+                </div>
+                <!-- </span> -->
             </div>
         </div>
     </div>
