@@ -145,6 +145,10 @@ def mask_image():
                 for f in os.listdir("./results/"):
                     print("[TEMP PATH] = "+f)
 
+                # ! Random 00 bug fix
+                if i == '00':
+                    i = '0'
+
                 # ? path of image to use for easyocr
                 img_ocr = str("./results/" + crop_path +
                               'image' + str(i) + '.jpg')
