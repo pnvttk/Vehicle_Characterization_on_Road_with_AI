@@ -1,4 +1,55 @@
 window.onload = () => {
+    $('#sendtoDB').click(() => {
+
+        // ? html element
+        var plateBox = $('#plateBox').val()
+        var provinceBox = $('#provinceBox').val()
+        box_path = box_path
+
+        // * check
+        // console.log("plate box")
+        // console.log(plateBox)
+        // console.log("province box")
+        // console.log(provinceBox)
+
+        data = {
+            'plate': plateBox,
+            'province': provinceBox,
+            'image': box_path
+        }
+
+        console.log(data)
+        // const json_data = JSON.stringify(data);
+        // console.log(json_data)
+
+        // ? ajax send to backend
+        $.ajax({
+            url: "/sendtoDB",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(data = {
+                'plate': plateBox,
+                'province': provinceBox,
+                'image': box_path
+            }),
+            dataType: 'json',
+            // cache: false,
+            // processData: false,
+            // contentType: false,
+
+            // ? error handle
+            error: function (response) {
+                console.log("upload error", response);
+                // console.log(response.getAllResponseHeaders());
+                // console.log(response.responseText)
+            },
+            success: function (response) {
+                console.log("upload success");
+                console.log(response);
+
+            },
+        })
+    })
     $('#sendbutton').click(() => {
         // ? html element
         imagebox = $('#imagebox')
@@ -41,6 +92,7 @@ window.onload = () => {
                     a_msg = data['alert']
                     bytestring = data['status']
                     ocr_txt = data['json_ocr_txt']
+                    box_path = data['box_path']
 
                     // * check
                     // console.log("a_msg : ", a_msg)
@@ -51,7 +103,7 @@ window.onload = () => {
                     if (bytestring != undefined) {
 
                         // * check
-                        // console.log("temp_image_path :", temp_image_path)
+                        // console.log("box_path :", box_path)
 
                         // ? replace image with new image from backend
                         abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
