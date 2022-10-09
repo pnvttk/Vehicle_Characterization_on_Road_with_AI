@@ -10,9 +10,11 @@ import torch
 import easyocr
 import uuid
 import pathlib
+import re
+import json
 from email.mime import image
 from enum import unique
-from operator import ne
+from operator import contains, ne
 from tkinter import BOTTOM
 from tkinter.tix import Tree
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
@@ -21,6 +23,8 @@ from unittest import result
 from PIL import Image
 from io import BytesIO
 from werkzeug.utils import secure_filename
+from province import province_th
+from thefuzz import fuzz, process
 # from eOCR import main
 
 app = Flask(__name__)
@@ -53,7 +57,6 @@ classes = model.names  # class names in string format
 # ? confidence threshold
 model.conf = 0.8
 
-
 # # ! testing
 # @app.route("/fetcg")
 # def hello_world():
@@ -82,6 +85,11 @@ def generate_custom_name(original_file_name):
     # return unique_name + pathlib.Path(original_file_name).suffix
 
 
+# ? check number in string
+def contains_number(string):
+    return any(char.isdigit() for char in string)
+
+
 # ? Main Yolov5 Object Detection
 @app.route('/detectObject', methods=['GET', 'POST'])
 def mask_image():
@@ -104,8 +112,8 @@ def mask_image():
 
     # ? Count class number from detection
     results.pandas().xyxy[0]  # Pandas DataFrame
-    print("[INFO] : Pandas Results")
-    print(results.pandas().xyxy[0])
+    # print("[INFO] : Pandas Results")
+    # print(results.pandas().xyxy[0])
     print("[INFO] : Count class name")
     # results.pandas().xyxy[0].value_counts('name')  # class counts (pandas)
     print(results.pandas().xyxy[0].value_counts(
@@ -117,7 +125,10 @@ def mask_image():
 
     # ? if results have any detection object.
     # ? Loop to get only class name
+    # ? array of check easyocr
     ocr_txt = []
+    # ? json to push to frontend
+    json_ocr_txt = []
     if len(info) != 0:
 
         # print("[INFO] : results name")
@@ -131,10 +142,9 @@ def mask_image():
             # ? If class == Plate crop image for EasyOCR
             if getClass_name == 'Plate':
 
-                print('[INFO] Croping image.')
+                # print('[INFO] Croping image.')
 
                 # ? crop plate and save in unique directory
-                # crops = results.crop(save=True)
                 results.crop(save_dir="results/" + new_name)
 
                 # ? temp crop path to access to crop image
@@ -142,7 +152,8 @@ def mask_image():
 
                 # ? loop to check new directory
                 for f in os.listdir("./results/"):
-                    print("[TEMP PATH] = "+f)
+                    j = ""
+                    # print("[TEMP PATH] = "+f)
 
                 # ! Random 00 bug fix
                 if i == '00':
@@ -152,14 +163,50 @@ def mask_image():
                 img_ocr = str("./results/" + crop_path +
                               'image' + str(i) + '.jpg')
 
-                print("[INFO] path for ocr")
-                print(img_ocr)
+                # print("[INFO] path for ocr")
+                # print(img_ocr)
 
                 # ? Extract text from Plate image
                 eOCR = EASY_OCR.readtext(str(img_ocr), detail=0)
 
+                # ? storing extract text
                 ocr_txt.append(eOCR)
-                print(eOCR)
+                print("[INFO] EasyOCR TEXT : ")
+                print(ocr_txt)
+
+                # ? Loop to check string from extract text
+                for txt in eOCR:
+
+                    # ? if txt have number in it
+                    if contains_number(txt):
+
+                        # ? remove special character
+                        r = re.compile('[@_!#$%^&*`()[];:<>?/\|}{~:]')
+                        re_txt = r.sub('', str(txt))
+                        re_txt2 = re.sub(r"[\[\]\:\|\!\`]", '', re_txt)
+
+                        print("[INFO] Detect number in " + txt + " SKIP Fuzzy")
+                        print("Re plate = " + re_txt2)
+
+                        # ? append key and value to json object
+                        json_ocr_txt.append({'plate': re_txt2})
+
+                    else:
+
+                        # ? remove specaial and english charater
+                        re_txt = re.sub('[A-Za-z]+', '', txt)
+
+                        print("[INFO] Re text : " + re_txt)
+
+                        # ? fuzzy text looking for similiar from province_th
+                        fuzzytxt = process.extract(
+                            str(re_txt), province_th, limit=2, scorer=fuzz.token_sort_ratio)
+
+                        print("[INFO] Fuzzy Text for (" + str(txt) + ") : ")
+                        print(fuzzytxt)
+
+                        # ? append key and value to json object
+                        json_ocr_txt.append({'province': fuzzytxt[0][0]})
 
                 # ? add 1 i = 1
                 i = int(i)+1
@@ -179,7 +226,7 @@ def mask_image():
         # ? return alert msg to ajax
         return jsonify({'alert': "alert('error')"})
 
-    print("last check : ", ocr_txt)
+    print("last check : ", json_ocr_txt)
 
     # ? make image to base64 then send to ajax
     for img in results.ims:
@@ -189,7 +236,7 @@ def mask_image():
         b64str = (base64.b64encode(buffered.getvalue()).decode(
             'utf-8'))  # base64 encoded image with results
 
-    return jsonify({'status': str(b64str), 'ocr_txt': ocr_txt})
+    return jsonify({'status': str(b64str), 'json_ocr_txt': json_ocr_txt})
 
 
 # ? Set Header

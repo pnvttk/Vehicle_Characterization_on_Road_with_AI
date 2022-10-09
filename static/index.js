@@ -2,7 +2,8 @@ window.onload = () => {
     $('#sendbutton').click(() => {
         imagebox = $('#imagebox')
         abox = $('#abox')
-        text_a = $('#ocr_txt')
+        plateBox = $('#plateBox')
+        provinceBox = $('#provinceBox')
         input = $('#imageinput')[0]
         if (input.files && input.files[0]) {
             let formData = new FormData();
@@ -20,13 +21,13 @@ window.onload = () => {
                 },
                 success: function (data) {
                     console.log("upload success");
-                    console.log(data);
+                    // console.log(data);
                     a_msg = data['alert']
                     bytestring = data['status']
-                    ocr_txt = data['ocr_txt']
+                    ocr_txt = data['json_ocr_txt']
                     // console.log("a_msg : ", a_msg)
                     // console.log("bytestring : ", bytestring)
-                    console.log("ocr_txt : ", ocr_txt)
+                    // console.log("ocr_txt : ", ocr_txt)
                     if (bytestring != undefined) {
                         // temp_image_path = data['temp_image']
                         // console.log("temp_image_path :", temp_image_path)
@@ -40,17 +41,35 @@ window.onload = () => {
                         })
                     }
                     if (ocr_txt != undefined) {
-                        new_arr = []
+                        plate_arr = []
+                        province_arr = []
                         ocr_txt.forEach(plate => {
                             for (let key in plate) {
+                                // console.log("For key in plate :")
                                 // console.log(`${key}: ${plate[key]}`)
-                                new_arr.push(`${plate[key]}`)
+
+                                ext_txt = `${plate[key]}`
+                                remove_special_char = ext_txt.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+                                // console.log(remove_special_char)
+                                // new_arr.push(remove_special_char)
+
+                                if (`${key}` == "plate") {
+                                    // console.log("For key in plate :")
+                                    // console.log(`${key}: ${plate[key]}`)
+                                    // plate_arr.push(`${plate[key]}`)
+                                    plate_arr.push(remove_special_char)
+                                }
+                                if (`${key}` == "province") {
+                                    // console.log(`${key}: ${plate[key]}`)
+                                    province_arr.push(remove_special_char)
+                                }
                             }
                         })
-
-                        result_arr = new_arr.toString().split(",").join("\n")
+                        plate_result = plate_arr.toString().split(",").join("\n")
+                        province_result = province_arr.toString().split(",").join("\n")
                         // console.log(result_arr)
-                        text_a.val(result_arr)
+                        plateBox.val(plate_result)
+                        provinceBox.val(province_result)
                         // text_a.val(JSON.stringify(ocr_txt))
                     }
                     if (a_msg != undefined) {
@@ -76,7 +95,7 @@ function readUrl(input) {
     if (input.files && input.files[0]) {
         let reader = new FileReader();
         reader.onload = function (e) {
-            console.log(e)
+            // console.log(e)
 
             imagebox.attr('src', e.target.result);
             abox.attr('href', e.target.result)
