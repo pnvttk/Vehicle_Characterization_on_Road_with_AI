@@ -1,14 +1,3 @@
-from email.mime import image
-from enum import unique
-from operator import ne
-from tkinter import BOTTOM
-from tkinter.tix import Tree
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from turtle import title
-from unittest import result
-from PIL import Image
-from io import BytesIO
-from eOCR import main
 import base64
 import cv2
 import numpy as np
@@ -21,8 +10,18 @@ import torch
 import easyocr
 import uuid
 import pathlib
-
+from email.mime import image
+from enum import unique
+from operator import ne
+from tkinter import BOTTOM
+from tkinter.tix import Tree
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from turtle import title
+from unittest import result
+from PIL import Image
+from io import BytesIO
 from werkzeug.utils import secure_filename
+# from eOCR import main
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
