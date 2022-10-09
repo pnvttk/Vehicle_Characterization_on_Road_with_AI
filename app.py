@@ -12,6 +12,7 @@ import uuid
 import pathlib
 import re
 import json
+import time
 from email.mime import image
 from enum import unique
 from operator import contains, ne
@@ -25,6 +26,7 @@ from io import BytesIO
 from werkzeug.utils import secure_filename
 from province import province_th
 from thefuzz import fuzz, process
+from pathlib import Path
 # from eOCR import main
 
 app = Flask(__name__)
@@ -68,13 +70,42 @@ model.conf = 0.8
 
 
 # # ? datatables
-@app.route("/dttb")
+@app.route("/dttb", methods=['POST', "GET"])
 def dttb():
 
-    cur = conn.cursor()
-    cur.execute('select * from detect_data')
-    tb_detect_data = cur.fetchall()
-    return render_template('dttb.html', title='datatables', data=tb_detect_data)
+    if request.method == 'POST':
+        cur = conn.cursor()
+        cur.execute('select * from detect_data')
+        tb_detect_data = cur.fetchall()
+
+        # print(tb_detect_data)
+
+        data = []
+        for row in tb_detect_data:
+            data.append({
+                'id': row[0],
+                'plate': row[1],
+                'province': row[2],
+                'brand': row[3],
+                'image': row[4]
+            })
+
+        # print(data)
+
+        response = {
+            'aaData': data
+        }
+
+        # print("response")
+        # print(response)
+        return jsonify(response)
+    else:
+        cur = conn.cursor()
+        cur.execute('select * from detect_data')
+        tb_detect_data = cur.fetchall()
+        return render_template('dttb.html', title='datatables', data=tb_detect_data)
+
+    # return render_template('dttb.html', title='datatables', data=tb_detect_data)
 
 
 # ? Unique name generate
@@ -90,9 +121,70 @@ def contains_number(string):
     return any(char.isdigit() for char in string)
 
 
+def progressbar(it, prefix="", size=60, out=sys.stdout):  # Python3.3+
+    count = len(it)
+
+    def show(j):
+        x = int(size*j/count)
+        print("{}[{}{}] {}/{}".format(prefix, "#"*x, "."*(size-x), j, count),
+              end='\r', file=out, flush=True)
+    show(0)
+    for i, item in enumerate(it):
+        yield item
+        show(i+1)
+    print("\n", flush=True, file=out)
+
+
+# ? thefuzz string
+def fuzzy(string):
+
+    fuzzy_sort = process.extract(
+        str(string), province_th, limit=2, scorer=fuzz.token_sort_ratio)
+    fuzzy_sort_conf = fuzzy_sort[0][1]
+    print("|---Fuzzy Conf = " + str(fuzzy_sort_conf) + " ---")
+
+    fuzzy_set = process.extract(
+        str(string), province_th, limit=2, scorer=fuzz.token_set_ratio)
+    fuzzy_set_conf = fuzzy_set[0][1]
+    print("|---Fuzzy Conf = " + str(fuzzy_set_conf) + " ---")
+
+    # fuzzy_partial = process.extract(
+    #     str(string), province_th, limit=2, scorer=fuzz.partial_ratio)
+    # fuzzy_partial_conf = fuzzy_partial[0][1]
+    # print("|---Fuzzy Conf = " + str(fuzzy_partial_conf) + " ---")
+
+    # fuzzy_ratio = process.extract(
+    #     str(string), province_th, limit=2, scorer=fuzz.ratio)
+    # fuzzy_ratio_conf = fuzzy_ratio[0][1]
+    # print("|---Fuzzy Conf = " + str(fuzzy_ratio_conf) + " ---")
+
+    max_conf = max(fuzzy_set_conf, fuzzy_sort_conf,
+                   #    fuzzy_partial_conf, fuzzy_ratio_conf)
+                   )
+    print("|** The most conf is : " + str(max_conf) + " **")
+
+    if max_conf == fuzzy_sort_conf:
+        print("|** Using fuzzy_sort **")
+        return fuzzy_sort
+    elif max_conf == fuzzy_set_conf:
+        print("|** Using fuzzy_set **")
+        return fuzzy_set
+    # elif max_conf == fuzzy_partial_conf:
+    #     print("|**Using fuzzy_partial**")
+    #     return fuzzy_partial
+    # elif max_conf == fuzzy_ratio:
+    #     print("|**Using fuzzy_ratio**")
+    #     return fuzzy_ratio
+
+
 # ? Main Yolov5 Object Detection
-@app.route('/detectObject', methods=['GET', 'POST'])
+
+
+@ app.route('/detectObject', methods=['GET', 'POST'])
 def mask_image():
+
+    for i in progressbar(range(15), "Start Detecting : ", 40):
+        time.sleep(0.1)  # any code you need
 
     # ? Get image from POST
     file = request.files["image"]
@@ -147,6 +239,10 @@ def mask_image():
                 # ? crop plate and save in unique directory
                 results.crop(save_dir="results/" + new_name)
 
+                # ? temp box path to access to crop image
+                box_path = str("./results/" + new_name + '/image0.jpg')
+                # print(box_path)
+
                 # ? temp crop path to access to crop image
                 crop_path = new_name + '/crops/Plate/'
 
@@ -173,6 +269,7 @@ def mask_image():
                 ocr_txt.append(eOCR)
                 print("[INFO] EasyOCR TEXT : ")
                 print(ocr_txt)
+                print("|")
 
                 # ? Loop to check string from extract text
                 for txt in eOCR:
@@ -183,13 +280,23 @@ def mask_image():
                         # ? remove special character
                         r = re.compile('[@_!#$%^&*`()[];:<>?/\|}{~:]')
                         re_txt = r.sub('', str(txt))
-                        re_txt2 = re.sub(r"[\[\]\:\|\!\`]", '', re_txt)
+                        re_txt2 = re.sub(r"[\[\]\:\|\!\`\&]", '', re_txt)
 
-                        print("[INFO] Detect number in " + txt + " SKIP Fuzzy")
-                        print("Re plate = " + re_txt2)
+                        print("[INFO] Detect number in (" + txt + ")")
+                        print("|Remove speacial chareater to (" + re_txt2 + ")")
 
-                        # ? append key and value to json object
-                        json_ocr_txt.append({'plate': re_txt2})
+                        if len(re_txt2) - re_txt2.count(' ') < 4:
+
+                            print("[INFO] Detect number have lenth less that 4")
+                            print("|Remove this from append")
+                            print("|")
+
+                        else:
+
+                            print("|")
+
+                            # ? append key and value to json object
+                            json_ocr_txt.append({'plate': re_txt2})
 
                     else:
 
@@ -199,11 +306,13 @@ def mask_image():
                         print("[INFO] Re text : " + re_txt)
 
                         # ? fuzzy text looking for similiar from province_th
-                        fuzzytxt = process.extract(
-                            str(re_txt), province_th, limit=2, scorer=fuzz.token_sort_ratio)
+                        # fuzzytxt = process.extract(
+                        #     str(re_txt), province_th, limit=2, scorer=fuzz.token_sort_ratio)
+                        fuzzytxt = fuzzy(re_txt)
 
                         print("[INFO] Fuzzy Text for (" + str(txt) + ") : ")
                         print(fuzzytxt)
+                        print("|")
 
                         # ? append key and value to json object
                         json_ocr_txt.append({'province': fuzzytxt[0][0]})
@@ -226,7 +335,10 @@ def mask_image():
         # ? return alert msg to ajax
         return jsonify({'alert': "alert('error')"})
 
-    print("last check : ", json_ocr_txt)
+    print("[PAYLOAD] : ", json_ocr_txt)
+    print("|")
+
+    print("Finish Detecting : [########################################]")
 
     # ? make image to base64 then send to ajax
     for img in results.ims:
@@ -236,7 +348,44 @@ def mask_image():
         b64str = (base64.b64encode(buffered.getvalue()).decode(
             'utf-8'))  # base64 encoded image with results
 
-    return jsonify({'status': str(b64str), 'json_ocr_txt': json_ocr_txt})
+    return jsonify({'status': str(b64str), 'json_ocr_txt': json_ocr_txt, 'box_path': str(box_path)})
+
+
+# ? Upload to DB
+@ app.route('/sendtoDB', methods=['POST'])
+def sendtoDB():
+
+    # ? Get ajax payload
+    if request.method == "POST":
+        # ? Get json
+        data = request.json
+
+        print("[INFO] GET DATA FROM FRONTEND")
+        print("|")
+        # print(type(data))
+
+        # ? convert json to object
+        # data = json.loads(data)
+        plate = data['plate']
+        province = data['province']
+
+        plate.replace(' ', '\n')
+        province.replace(' ', '\n')
+
+        print(data['image'])
+        random_p = uuid.uuid4().hex
+
+        print(Path(data['image']).rename(
+            "./static/upload/" + random_p + ".jpg"))
+        image_uploda = random_p + ".jpg"
+
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO detect_data (plate, province, image) VALUES (%s, %s, %s)",
+                       (plate, province, image_uploda))
+        conn.commit()
+
+        return jsonify({'status': 'success'})
+    return ('', 204)
 
 
 # ? Set Header
@@ -254,6 +403,12 @@ def after_request(response):
 @ app.route("/", methods=['GET', 'POST'])
 def new():
     return render_template('new.html')
+
+
+# ? datatable path
+@ app.route("/table", methods=['GET', 'POST'])
+def table():
+    return render_template('dttb.html')
 
 
 # ? server and port setup
