@@ -53,11 +53,11 @@ conn = pymysql.connect(host='localhost',
 
 # ? Local custom model
 model = torch.hub.load('./yolov5', 'custom', source='local',
-                       path='./models_train/yolov5x.pt', force_reload=True)  # The repo is stored locally
+                       path='./models_train/yolov5x_new.pt', force_reload=True)  # The repo is stored locally
 # ? all classname
 classes = model.names  # class names in string format
 # ? confidence threshold
-model.conf = 0.8
+# model.conf = 0.5
 
 # # ! testing
 # @app.route("/fetcg")
