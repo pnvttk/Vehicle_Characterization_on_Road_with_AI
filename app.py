@@ -1,4 +1,6 @@
+from asyncio.windows_events import NULL
 import base64
+from itertools import count
 import cv2
 import numpy as np
 import sys
@@ -59,58 +61,9 @@ classes = model.names  # class names in string format
 # ? confidence threshold
 # model.conf = 0.5
 
-# # ! testing
-# @app.route("/fetcg")
-# def hello_world():
-#
-#     cur = conn.cursor()
-#     cur.execute('select * from student')
-#     rows = cur.fetchall()
-#     return render_template('fetch.html', data=rows)
-
-
-# # ? datatables
-@app.route("/dttb", methods=['POST', "GET"])
-def dttb():
-
-    if request.method == 'POST':
-        cur = conn.cursor()
-        cur.execute('select * from detect_data')
-        tb_detect_data = cur.fetchall()
-
-        # print(tb_detect_data)
-
-        data = []
-        for row in tb_detect_data:
-            data.append({
-                'id': row[0],
-                'plate': row[1],
-                'province': row[2],
-                'brand': row[3],
-                'image': row[4]
-            })
-
-        # print(data)
-
-        response = {
-            'aaData': data
-        }
-
-        # print("response")
-        # print(response)
-        return jsonify(response)
-    else:
-        cur = conn.cursor()
-        cur.execute('select * from detect_data')
-        tb_detect_data = cur.fetchall()
-        return render_template('dttb.html', title='datatables', data=tb_detect_data)
-
-    # return render_template('dttb.html', title='datatables', data=tb_detect_data)
-
 
 # ? Unique name generate
 def generate_custom_name(original_file_name):
-
     unique_name = uuid.uuid4().hex
     return unique_name
     # return unique_name + pathlib.Path(original_file_name).suffix
@@ -137,9 +90,9 @@ def progressbar(it, prefix="", size=60, out=sys.stdout):  # Python3.3+
 
 # ? thefuzz string
 def fuzzy(string):
-
     fuzzy_sort = process.extract(
         str(string), province_th, limit=2, scorer=fuzz.token_sort_ratio)
+
     fuzzy_sort_conf = fuzzy_sort[0][1]
     print("|---Fuzzy Conf = " + str(fuzzy_sort_conf) + " ---")
 
@@ -178,8 +131,6 @@ def fuzzy(string):
 
 
 # ? Main Yolov5 Object Detection
-
-
 @ app.route('/detectObject', methods=['GET', 'POST'])
 def mask_image():
 
@@ -210,6 +161,9 @@ def mask_image():
     # results.pandas().xyxy[0].value_counts('name')  # class counts (pandas)
     print(results.pandas().xyxy[0].value_counts(
         'name'))  # class counts (pandas)
+    count_result = results.pandas().xyxy[0].value_counts(
+        'name')  # class counts (pandas)
+    # print(str(count_result))
 
     # # Get access to class name
     # ? info for array of results
@@ -285,7 +239,7 @@ def mask_image():
                         print("[INFO] Detect number in (" + txt + ")")
                         print("|Remove speacial chareater to (" + re_txt2 + ")")
 
-                        if len(re_txt2) - re_txt2.count(' ') < 4:
+                        if len(re_txt2) - re_txt2.count(' ') < 2:
 
                             print("[INFO] Detect number have lenth less that 4")
                             print("|Remove this from append")
@@ -348,7 +302,7 @@ def mask_image():
         b64str = (base64.b64encode(buffered.getvalue()).decode(
             'utf-8'))  # base64 encoded image with results
 
-    return jsonify({'status': str(b64str), 'json_ocr_txt': json_ocr_txt, 'box_path': str(box_path)})
+    return jsonify({'status': str(b64str), 'count_result': str(count_result), 'json_ocr_txt': json_ocr_txt, 'box_path': str(box_path)})
 
 
 # ? Upload to DB
@@ -388,6 +342,45 @@ def sendtoDB():
     return ('', 204)
 
 
+# ? Root path
+@ app.route("/", methods=['GET', 'POST'])
+def index():
+    return render_template('index.html')
+
+
+# # ? datatables
+@app.route("/api/table", methods=['POST', "GET"])
+def api_table():
+    cur = conn.cursor()
+    cur.execute('select * from detect_data')
+    tb_detect_data = cur.fetchall()
+
+    data = []
+    for row in tb_detect_data:
+        data.append({
+            'id': row[0],
+            'plate': row[1],
+            'province': row[2],
+            'brand': row[3],
+            'image': row[4]
+        })
+
+    # print(data)
+
+    response = {
+        'aaData': data
+    }
+
+    return jsonify(response)
+
+
+# # ? datatable path
+@ app.route("/table", methods=['GET', 'POST'])
+def table():
+    return render_template('table.html')
+    # return render_template('table_ajax.html')
+
+
 # ? Set Header
 @ app.after_request
 def after_request(response):
@@ -397,18 +390,6 @@ def after_request(response):
                          'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
-
-
-# ? Root path
-@ app.route("/", methods=['GET', 'POST'])
-def new():
-    return render_template('new.html')
-
-
-# ? datatable path
-@ app.route("/table", methods=['GET', 'POST'])
-def table():
-    return render_template('dttb.html')
 
 
 # ? server and port setup

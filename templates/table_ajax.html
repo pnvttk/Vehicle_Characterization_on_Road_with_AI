@@ -1,6 +1,41 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
+<head>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <!-- Jquery DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+
+    <!-- FeatherLight -->
+    <link href="//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.css" type="text/css"
+        rel="stylesheet" />
+
+    <!--static  -->
+    <link rel="stylesheet" type="text/css" href="../static/index.css">
+
+    <!-- sweeatalert2 -->
+    <!-- <link rel="stylesheet" href="sweetalert2.min.css"> -->
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table</title>
+
+    <style>
+        .text-wrap {
+            white-space: pre-line;
+
+        }
+
+        .width-200 {
+            width: 200px;
+        }
+    </style>
+</head>
+
 <div class="container position-relative" data-aos="fade-up">
     <div class="table-responsive">
         <br>
@@ -36,9 +71,24 @@
         </table>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<!-- Jquery -->
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+
+<!-- FeatherLight -->
+<script src="//code.jquery.com/jquery-latest.js"></script>
+<script src="//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.js" type="text/javascript"
+    charset="utf-8"></script>
+
+<!-- Sweetalert2  -->
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script type="text/javascript" src="../static/index.js"></script>
+
+<!-- Jquery DataTables -->
+<script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
 <script>
     $(document).ready(function () {
         $('#dttb').DataTable({
@@ -103,4 +153,6 @@
         });
     });
 </script>
-{% endblock%}
+</body>
+
+</html>
