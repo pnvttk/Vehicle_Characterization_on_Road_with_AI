@@ -1,40 +1,72 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container position-relative" data-aos="fade-up">
-    <div class="table-responsive">
-        <br>
-        <center>
-            <div class="mb-5">
-                <button name=" submitSearch" id="btn-search" type="submit" class="btn btn-primary"
-                    style="width:180px;height:40px">ดูประวัติการใช้รถ</button>
-                <button style="width:180px;height:40px" type="submit" id="btn-reserve"
-                    class=" btn btn-outline-primary">ไปหน้าจองรถ</button>
-                <button name="clear" id="btn-clear" onclick="window.location.reload()" type="submit"
-                    class="btn btn-outline-secondary" style="width:180px;height:40px">ล้างข้อมูลใหม่</button>
-                <button name="calendar" id="btn-calendar"
-                    onclick="window.open('https://app.powerbi.com/reportEmbed?reportId=28a16415-56c4-4ca4-9a00-2377e9a4c35f&autoAuth=true&ctid=5db8bf0e-8592-4ed0-82b2-a6d4d77933d4&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXNvdXRoLWVhc3QtYXNpYS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldC8ifQ%3D%3D')"
-                    type="submit" class="btn btn-outline-secondary"
-                    style="width:180px;height:40px">ดูปฏิทินจองใช้</button>
-                <button name="PoolSTS" id="btn-PoolSTS"
-                    onclick="window.open('http://sccts.ddns.net/carservice/car/bc_onepage.asp?input=u')" type="submit"
-                    class="btn btn-outline-secondary" style="width:180px;height:40px">จองรถโรงงาน</button>
-            </div>
-        </center>
-        <table id="dttb" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>License Plate</th>
-                    <th>Province</th>
-                    <th>Brand</th>
-                    <th>Image</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-    </div>
+<div class="py-4 ">
+    <section id="contact" class="contact">
+        <div class="container position-relative" data-aos="fade-up">
+            <div class="row gy-4 d-flex justify-content-end">
+
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">เลขป้ายทะเบียน</div>
+                            <input type="text" name="edate" id="edate" value=""
+                                class="form-control form-control-sm input-sm" readonly style="background-color: white;">
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">จังหวัด</div>
+                            <input type="text" name="edate" id="edate" value=""
+                                class="form-control form-control-sm input-sm" readonly style="background-color: white;">
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">ยี่ห้อ</div>
+                            <input type="text" name="edate" id="edate" value=""
+                                class="form-control form-control-sm input-sm" readonly style="background-color: white;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">วันที่บันทึก</div>
+                            <input type="text" name="edate" id="edate" value=""
+                                class="form-control form-control-sm input-sm" readonly style="background-color: white;">
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- End Contact Form -->
+        </div>
+
+    </section>
+</div>
+
+<table id="dttb" class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>License Plate</th>
+            <th>Province</th>
+            <th>Brand</th>
+            <th>Type</th>
+            <th>Color</th>
+            <th>Date</th>
+            <th>Image</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
 </div>
 {% endblock %}
 
@@ -61,7 +93,9 @@
                     "defaultContent": "-",
                     width: '10%',
                     "render": function (data, type, row) {
-                        return data.split("\n").join("<br/>");
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
                     },
                 },
                 {
@@ -69,12 +103,49 @@
                     "defaultContent": "-",
                     width: '10%',
                     "render": function (data, type, row) {
-                        return data.split("\n").join("<br/>");
-                    }
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+
                 },
                 {
                     data: 'brand',
                     "defaultContent": "-",
+                    width: '10%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+                },
+                {
+                    data: 'type',
+                    "defaultContent": "-",
+                    width: '10%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+
+                },
+                {
+                    data: 'color',
+                    "defaultContent": "-",
+                    width: '10%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        } else {
+                            data = "-"
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: 'upload_date',
+                    // "defaultContent": "-",
                     width: '10%',
                 },
                 {
@@ -92,12 +163,16 @@
                 },
             ],
             columnDefs: [
-                {
-                    render: function (data, type, full, meta) {
-                        return "<div class='text-wrap width-200'>" + data + "</div>";
-                    },
-                    targets: 3
-                }
+                // {
+                //     render: function (data, type, full, meta) {
+                //         return "<div class='text-wrap width-200'>" + data + "</div>";
+                //     },
+                //     targets: 3
+                // },
+                // {
+                //     "defaultContent": "-",
+                //     "targets": "_all"
+                // }
             ]
 
         });
