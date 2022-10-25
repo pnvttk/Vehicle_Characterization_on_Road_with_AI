@@ -49,6 +49,10 @@ window.onload = () => {
         plateBox = $('#plateBox')
         provinceBox = $('#provinceBox')
 
+        plateBox.val("")
+        provinceBox.val("")
+
+
         // ? Get image input
         input = $('#imageinput')[0]
 
