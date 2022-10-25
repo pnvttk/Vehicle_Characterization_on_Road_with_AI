@@ -118,7 +118,7 @@ def fuzzy(string):
     #                )
     # print("|** The most conf is : " + str(max_conf) + " **")
 
-    if fuzzy_sort_conf > 80:
+    if fuzzy_sort_conf >= 80:
         return fuzzy_sort
         # if max_conf == fuzzy_sort_conf:
         #     print("|** Using fuzzy_sort **")
