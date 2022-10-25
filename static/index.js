@@ -54,6 +54,7 @@ window.onload = () => {
         // ? html element
         imagebox = $('#imagebox')
         abox = $('#abox')
+        cbox = $('#cbox')
         plateBox = $('#plateBox')
         provinceBox = $('#provinceBox')
 
@@ -93,11 +94,13 @@ window.onload = () => {
                     bytestring = data['status']
                     ocr_txt = data['json_ocr_txt']
                     box_path = data['box_path']
+                    count_result = data['count_result']
 
                     // * check
                     // console.log("a_msg : ", a_msg)
                     // console.log("bytestring : ", bytestring)
                     // console.log("ocr_txt : ", ocr_txt)
+                    // console.log("count_result : ", count_result)
 
                     // ? if get image
                     if (bytestring != undefined) {
@@ -165,6 +168,14 @@ window.onload = () => {
                         // ? set value in frontend
                         plateBox.val(plate_result)
                         provinceBox.val(province_result)
+                    }
+
+                    // ? if get counts result 
+                    if (count_result != undefined) {
+                        c_result = count_result.toString().split("\g").join("\n")
+                        c_result = c_result.replace("name", "Results")
+                        c_result = c_result.replace("dtype: int64", "")
+                        cbox.text(c_result)
                     }
 
                     // ? if alert msg is not set

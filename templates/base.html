@@ -2,7 +2,6 @@
 <html>
 
 <head>
-    {% block head %}
     <title>{{ title }}</title>
 
     <!-- Bootstrap -->
@@ -10,7 +9,7 @@
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 
     <!-- Jquery DataTables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
 
     <!-- FeatherLight -->
     <link href="//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.css" type="text/css"
@@ -18,32 +17,27 @@
 
     <!--static  -->
     <link rel="stylesheet" type="text/css" href="../static/index.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="../static/index.js"></script>
 
     <!-- sweeatalert2 -->
-    <link rel="stylesheet" href="sweetalert2.min.css">
+    <!-- <link rel="stylesheet" href="sweetalert2.min.css"> -->
 
-    {% endblock %}
+
+
+
 </head>
 
-
 <body>
-
     <div class="container">
+        {% block content %}{% endblock %}
     </div>
 
+
+
+
     <!-- Jquery -->
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
-    <!-- Jquery DataTables -->
-    <script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 
-    <!-- Bootstrap Jquery DataTables -->
-    <script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
 
     <!-- FeatherLight -->
     <script src="//code.jquery.com/jquery-latest.js"></script>
@@ -53,8 +47,11 @@
     <!-- Sweetalert2  -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script type="text/javascript" src="../static/index.js"></script>
 
-    {% block content %}{% endblock %}
+    <!-- Jquery DataTables -->
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 
