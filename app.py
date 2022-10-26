@@ -392,6 +392,10 @@ def after_request(response):
     return response
 
 
+@ app.route("/chart")
+def chart ():
+    return render_template('chart.html')
+
 # ? server and port setup
 if __name__ == "__main__":
     # ? Set port
@@ -409,3 +413,4 @@ if __name__ == "__main__":
 
     # model.eval()
     app.run(host="0.0.0.0", port=args.port, debug=True)
+
