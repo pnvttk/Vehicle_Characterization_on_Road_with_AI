@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 11, 2022 at 10:35 AM
+-- Generation Time: Oct 25, 2022 at 10:11 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -40,7 +40,8 @@ CREATE TABLE `detect_data` (
 --
 
 INSERT INTO `detect_data` (`id`, `plate`, `province`, `brand`, `image`) VALUES
-(4, '1ม2087\n30-273', 'กรุงเทพมหานคร\nพัทลุง', NULL, '51312a709d3f4203897c60298e9affce.jpg');
+(4, '1ม2087\n30-273', 'กรุงเทพมหานคร\nพัทลุง', NULL, '51312a709d3f4203897c60298e9affce.jpg'),
+(5, 'ขง 3279', 'เชียงใหม่', NULL, '9a84abd6a090447593bf3ca57d58338a.jpg');
 
 -- --------------------------------------------------------
 
@@ -87,7 +88,7 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `detect_data`
 --
 ALTER TABLE `detect_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `student`
