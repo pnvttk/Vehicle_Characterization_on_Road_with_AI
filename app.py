@@ -423,7 +423,28 @@ def api_table():
 # # ? datatable path
 @ app.route("/table", methods=['GET', 'POST'])
 def table():
-    return render_template('table.html')
+
+    # ? Get data from db
+    cur = conn.cursor()
+    cur.execute('SELECT plate FROM `detect_data`;')
+    plate_data = [item[0] for item in cur.fetchall()]
+    cur.execute('SELECT province_name FROM `province`;')
+    province_data = [item[0] for item in cur.fetchall()]
+    cur.execute('SELECT brand_name FROM `brand`;')
+    brand_data = [item[0] for item in cur.fetchall()]
+    cur.execute('SELECT type_name FROM `type`;')
+    type_data = [item[0] for item in cur.fetchall()]
+    cur.execute('SELECT color_name FROM `color`;')
+    color_data = [item[0] for item in cur.fetchall()]
+
+    # * check log
+    # print(plate_data)
+    # print(province_data)
+    # print(brand_data)
+    # print(type_data)
+    # print(color_data)
+
+    return render_template('table.html', plate_data=plate_data, province_data=province_data, brand_data=brand_data, type_data=type_data, color_data=color_data)
     # return render_template('table_ajax.html')
 
 
