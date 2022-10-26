@@ -1,7 +1,4 @@
-from asyncio.windows_events import NULL
 import base64
-from distutils.command.upload import upload
-from itertools import count
 import cv2
 import numpy as np
 import sys
@@ -16,6 +13,9 @@ import pathlib
 import re
 import json
 import time
+from asyncio.windows_events import NULL
+from distutils.command.upload import upload
+from itertools import count
 from datetime import datetime, timezone, timedelta
 from email.mime import image
 from enum import unique
@@ -36,13 +36,15 @@ from pathlib import Path
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-# DEFINING GLOBAL VARIABLE
+# ? DEFINING GLOBAL VARIABLE
 EASY_OCR = easyocr.Reader(['th'])  # initiating easyocr
+# ? OCR CONF
 OCR_TH = 0.2
 
-# Define path
+# ? Define temp path
 UPLOAD_FOLDER = './results'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+# ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -76,27 +78,13 @@ def contains_number(string):
     return any(char.isdigit() for char in string)
 
 
-def progressbar(it, prefix="", size=60, out=sys.stdout):  # Python3.3+
-    count = len(it)
-
-    def show(j):
-        x = int(size*j/count)
-        print("{}[{}{}] {}/{}".format(prefix, "#"*x, "."*(size-x), j, count),
-              end='\r', file=out, flush=True)
-    show(0)
-    for i, item in enumerate(it):
-        yield item
-        show(i+1)
-    print("\n", flush=True, file=out)
-
-
 # ? thefuzz string
 def fuzzy(string):
     fuzzy_sort = process.extract(
         str(string), province_th, limit=2, scorer=fuzz.token_sort_ratio)
 
     fuzzy_sort_conf = fuzzy_sort[0][1]
-    print("|---Fuzzy Conf = " + str(fuzzy_sort_conf) + " ---")
+    print("|---Sorting text Conf = " + str(fuzzy_sort_conf) + " ---")
 
     # fuzzy_set = process.extract(
     #     str(string), province_th, limit=2, scorer=fuzz.token_set_ratio)
@@ -142,8 +130,14 @@ def fuzzy(string):
 @ app.route('/detectObject', methods=['GET', 'POST'])
 def mask_image():
 
-    for i in progressbar(range(15), "Start Detecting : ", 40):
-        time.sleep(0.1)  # any code you need
+    rows = 5
+    for i in range(0, rows):
+        # nested loop for each column
+        for j in range(0, i + 1):
+            # print star
+            print("*", end=' ')
+        # new line after each row
+        print("\r")
 
     # ? Get image from POST
     file = request.files["image"]
@@ -162,16 +156,12 @@ def mask_image():
     # results.save(save_dir="results/test.jpg")
 
     # ? Count class number from detection
-    results.pandas().xyxy[0]  # Pandas DataFrame
+    # results.pandas().xyxy[0]  # Pandas DataFrame
     # print("[INFO] : Pandas Results")
     # print(results.pandas().xyxy[0])
     print("[INFO] : Count class name")
-    # results.pandas().xyxy[0].value_counts('name')  # class counts (pandas)
-    print(results.pandas().xyxy[0].value_counts(
-        'name'))  # class counts (pandas)
-    count_result = results.pandas().xyxy[0].value_counts(
-        'name')  # class counts (pandas)
-    # print(str(count_result))
+    print(results.pandas().xyxy[0].value_counts('name'))
+    count_result = results.pandas().xyxy[0].value_counts('name')
 
     # # Get access to class name
     # ? info for array of results
@@ -265,7 +255,7 @@ def mask_image():
                         # ? remove specaial and english charater
                         re_txt = re.sub('[A-Za-z]+', '', txt)
 
-                        print("[INFO] Re text : " + re_txt)
+                        print("[INFO] Remove special char from text : " + re_txt)
 
                         # ? fuzzy text looking for similiar from province_th
                         # fuzzytxt = process.extract(
@@ -273,14 +263,14 @@ def mask_image():
                         fuzzytxt = fuzzy(re_txt)
 
                         if fuzzytxt == NULL:
-                            print("[INFO] Fuzzy Text for (" + str(txt) + ") : ")
+                            print("[INFO] Sorting Text for (" + str(txt) + ") : ")
                             print(fuzzytxt)
                             print("|")
 
                             # ? append key and value to json object
                             json_ocr_txt.append({'province': NULL})
                         else:
-                            print("[INFO] Fuzzy Text for (" + str(txt) + ") : ")
+                            print("[INFO] Sorting Text for (" + str(txt) + ") : ")
                             print(fuzzytxt)
                             print("|")
 
@@ -308,7 +298,13 @@ def mask_image():
     print("[PAYLOAD] : ", json_ocr_txt)
     print("|")
 
-    print("Finish Detecting : [########################################]")
+    rows = 5
+    for i in range(rows + 1, 0, -1):
+        # nested reverse loop
+        for j in range(0, i - 1):
+            # display star
+            print("*", end=' ')
+        print(" ")
 
     # ? make image to base64 then send to ajax
     for img in results.ims:
@@ -365,14 +361,14 @@ def sendtoDB():
 
         now = datetime.now()  # current date and time
 
-        year = now.strftime("%Y")
-        # print("year:", year)
-        month = now.strftime("%m")
-        # print("month:", month)
-        day = now.strftime("%d")
-        # print("day:", day)
-        time = now.strftime("%H:%M:%S")
-        # print("time:", time)
+        # year = now.strftime("%Y")
+        # # print("year:", year)
+        # month = now.strftime("%m")
+        # # print("month:", month)
+        # day = now.strftime("%d")
+        # # print("day:", day)
+        # time = now.strftime("%H:%M:%S")
+        # # print("time:", time)
 
         date_time = now.strftime("%m/%d/%Y, %H:%M")
         # print("date and time:", date_time)
