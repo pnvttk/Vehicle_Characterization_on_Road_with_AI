@@ -178,6 +178,7 @@ def mask_image():
         # print("[INFO] : results name")
         # print(info)
         i = 0
+        box_path = None
         for result in info:
 
             # ? Get class name from for loop
