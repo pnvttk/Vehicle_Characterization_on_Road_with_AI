@@ -1,4 +1,6 @@
 import base64
+from cmath import log
+from urllib import response
 import cv2
 import numpy as np
 import sys
@@ -437,6 +439,8 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
 
+
+    
 
 @ app.route("/chart")
 def chart ():
