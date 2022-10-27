@@ -5,3 +5,4 @@
 /yolov5/*
 /models_train/*
 /results/*
+.vercel
