@@ -106,6 +106,18 @@ window.onload = () => {
                     // console.log("ocr_txt : ", ocr_txt)
                     // console.log("count_result : ", count_result)
 
+
+                    // console.log("box_path")
+                    // console.log(typeof box_path)
+                    // console.log(box_path)
+                    // if (box_path == undefined || "") {
+                    //     Swal.fire({
+                    //         icon: 'warning',
+                    //         title: "Detect successfully.",
+                    //         text: "But can't detect plate.",
+                    //     })
+                    // }
+
                     // ? if get image
                     if (bytestring != undefined) {
 
@@ -162,7 +174,7 @@ window.onload = () => {
                             }
                         })
 
-                        console.log(province_arr)
+                        // console.log(province_arr)
 
                         // ? check if province text == 0
                         if (province_arr[0] == 0) {
@@ -190,6 +202,7 @@ window.onload = () => {
 
                     }
 
+
                     // ? if get counts result 
                     if (count_result != undefined) {
                         c_result = count_result.toString().split("\g").join("\n")
@@ -204,11 +217,11 @@ window.onload = () => {
                         c_result_remove = c_result_remove.replace('\t', '');
                         c_result_remove = c_result_remove.replace(/\s/, '');
                         c_result_remove = c_result_remove.replace(/^\s+|\s+$/gm, '');
-                        console.log(c_result_remove)
+                        // console.log(c_result_remove)
 
                         c_result_arr = c_result_remove.split("\n")
 
-                        console.log(c_result_arr)
+                        // console.log(c_result_arr)
 
 
 
@@ -220,7 +233,7 @@ window.onload = () => {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: "Object Detection have been failed! \n Look like there isn't Plate or Brand in this image",
+                            text: "Object Detection have been failed! \n Look like there isn't car in this image",
                         }).then(function () {
                             location.reload();
                         }
@@ -272,9 +285,9 @@ window.onload = () => {
         color = sort_color.toString().split(",").join("\n")
 
 
-        console.log(type)
-        console.log(brand)
-        console.log(color)
+        // console.log(type)
+        // console.log(brand)
+        // console.log(color)
 
         data = {
             'plate': plateBox,
@@ -285,7 +298,7 @@ window.onload = () => {
             'image': box_path
         }
 
-        console.log(data)
+        // console.log(data)
         // const json_data = JSON.stringify(data);
         // console.log(json_data)
 
