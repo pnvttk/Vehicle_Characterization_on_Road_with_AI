@@ -31,10 +31,13 @@ from werkzeug.utils import secure_filename
 from province import province_th
 from thefuzz import fuzz, process
 from pathlib import Path
+# from flask import Flask
+from flask_ngrok import run_with_ngrok
 # from eOCR import main
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+# run_with_ngrok(app)
 
 # ? DEFINING GLOBAL VARIABLE
 EASY_OCR = easyocr.Reader(['th'])  # initiating easyocr
@@ -49,10 +52,17 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 # ? MySQL setup
-conn = pymysql.connect(host='localhost',
-                       user='root',
-                       passwd='',
-                       db='flask'
+# conn = pymysql.connect(host='localhost',
+#                        user='root',
+#                        passwd='',
+#                        db='flask'
+#                        #    cursorclass=pymysql.cursors.DictCursor
+#                        )
+conn = pymysql.connect(host='sql.freedb.tech',
+                       user='freedb_pnvttk',
+                       passwd='d5*cJtFdQXSUkcQ',
+                       db='freedb_pnvttk_flask',
+                       port=3306
                        #    cursorclass=pymysql.cursors.DictCursor
                        )
 
@@ -477,3 +487,4 @@ if __name__ == "__main__":
 
     # model.eval()
     app.run(host="0.0.0.0", port=args.port, debug=True)
+    # app.run(port=5000)
