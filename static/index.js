@@ -65,7 +65,7 @@ window.onload = () => {
 
             // ? ajax send to backend
             $.ajax({
-                url: "http://localhost:5000/detectObject",
+                url: "/detectObject",
                 type: "POST",
                 data: formData,
                 cache: false,
