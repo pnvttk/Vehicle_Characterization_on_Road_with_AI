@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="py-4 ">
+    <section id="contact" class="contact">
+        <div class="container position-relative" data-aos="fade-up">
+            <div class="row gy-4 d-flex justify-content-end">
+
+
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">เลขป้ายทะเบียน</div>
+                            <input type="text" name="edate" id="edate" value=""
+                                class="form-control form-control-sm input-sm" readonly style="background-color: white;">
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">Province</div>
+                            <input class="form-control" list="province_list" id="province_name"
+                                placeholder="Type to search...">
+                            <datalist id="province_list">
+                                {% for province in province_data %}
+                                <option value="{{province}}">
+                                    {% endfor %}
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">Brand</div>
+                            <input class="form-control" list="brand_list" id="brand_name"
+                                placeholder="Type to search...">
+                            <datalist id="brand_list">
+                                {% for brand in brand_data %}
+                                <option value="{{brand}}">
+                                    {% endfor %}
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">Type</div>
+                            <input class="form-control" list="type_list" id="type_name" placeholder="Type to search...">
+                            <datalist id="type_list">
+                                {% for type in type_data %}
+                                <option value="{{type}}">
+                                    {% endfor %}
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-item d-flex">
+                    <div>
+                        <div class="input-group col-xs-2">
+                            <div class="input-group-text">Color</div>
+                            <input class="form-control" list="color_list" id="color_name"
+                                placeholder="Type to search...">
+                            <datalist id="color_list">
+                                {% for color in color_data %}
+                                <option value="{{color}}">
+                                    {% endfor %}
+                            </datalist>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- {% for i in province_data %}
+{{i}}
+{% endfor %} -->
+
+
+<!-- <button style="width:180px;height:40px" type="button" id="btn-show-log" class="btn btn-outline-primary"
+    name="button">Show table</button> -->
+<table id="dttb" class="table table-striped table-hover hover row-border stripe text-start display nowrap"
+    cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>License Plate</th>
+            <th>Province</th>
+            <th>Brand</th>
+            <th>Type</th>
+            <th>Color</th>
+            <th>Date</th>
+            <th>Image</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+
+        $('#example thead tr#filterrow th').each(function () {
+            var title = $('#example thead th').eq($(this).index()).text();
+            $(this).html('<input type="text" onclick="stopPropagation(event);" placeholder="Search ' + title + '" />');
+        });
+        // Apply the filter
+        $("#example thead input").on('keyup change', function () {
+            table
+                .column($(this).parent().index() + ':visible')
+                .search(this.value)
+                .draw();
+        });
+
+        $('#dttb').DataTable({
+            // initComplete: function () {
+            //     this.api().columns([2, 3, 4, 5]).every(function () {
+            //         var column = this;
+            //         var select = $('<select><option value=""></option></select>')
+            //             .appendTo($(column.footer()).empty())
+            //             .on('change', function () {
+            //                 var val = $.fn.dataTable.util.escapeRegex(
+            //                     $(this).val()
+            //                 );
+
+            //                 column
+            //                     .search(val ? '^' + val + '$' : '', true, false)
+            //                     .draw();
+            //             });
+
+            //         column.data().unique().sort().each(function (d, j) {
+            //             select.append('<option value="' + d + '">' + d + '</option>');
+            //         });
+            //     });
+
+            //     this.api().columns([1, 6]).every(function () {
+            //         var that = this;
+            //         var input = $('<input type="text" placeholder="Search" />')
+            //             .appendTo($(this.footer()).empty())
+
+            //             .on('keyup change', function () {
+            //                 if (that.search() !== this.value) {
+            //                     that
+            //                         .search(this.value)
+            //                         .draw();
+            //                 }
+            //             });
+            //     });
+            // },
+            responsive: true,
+            scrollY: false,
+            scrollX: false,
+            orderCellsTop: true,
+            "searching": true,
+            "paging": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": true,
+            ajax: '/api/table',
+            columns: [
+                {
+                    data: 'id',
+                    "defaultContent": "-",
+                    width: '1%'
+                },
+                {
+                    data: 'plate',
+                    "defaultContent": "-",
+                    width: '5%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+                },
+                {
+                    data: 'province',
+                    "defaultContent": "-",
+                    width: '5%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+
+                },
+                {
+                    data: 'brand',
+                    "defaultContent": "-",
+                    width: '5%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+                },
+                {
+                    data: 'type',
+                    "defaultContent": "-",
+                    width: '5%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        }
+                    },
+
+                },
+                {
+                    data: 'color',
+                    "defaultContent": "-",
+                    width: '5%',
+                    "render": function (data, type, row) {
+                        if (data != null) {
+                            return data.split("\n").join("<br/>");
+                        } else {
+                            data = "-"
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: 'upload_date',
+                    // "defaultContent": "-",
+                    width: '5%',
+                },
+                {
+                    data: 'image',
+                    "defaultContent": "-",
+                    width: '10%',
+                    render: function (data, type, row) {
+                        if (data === null || data === "") {
+                            return "-"
+                        } else {
+                            return `<a href="/static/upload/${data}" data-featherlight><img src="/static/upload/${data}" width="70%"></a>`;
+                        }
+                    },
+                    orderable: false, searchable: false
+                },
+            ],
+            columnDefs: [
+                // {
+                //     render: function (data, type, full, meta) {
+                //         return "<div class='text-wrap width-200'>" + data + "</div>";
+                //     },
+                //     targets: 3
+                // },
+                // {
+                //     "defaultContent": "-",
+                //     "targets": "_all"
+                // }
+            ]
+        });
+
+        function stopPropagation(evt) {
+            if (evt.stopPropagation !== undefined) {
+                evt.stopPropagation();
+            } else {
+                evt.cancelBubble = true;
+            }
+        }
+
+        // button btn-show-log
+        $('#btn-show-log').click(function (e) {
+
+            // set id from button
+            var id = document.getElementById('btn-show-log').id
+
+            // // show header text
+            // if (id == "btn-show-log") {
+            //     // console.log(id)
+            //     document.getElementById("headertxt").innerHTML = "<th>ประวัติ จอง-คืน</th>"
+            // }
+
+            // ajax data source
+            urlRequest = '/api/table'
+
+            // load datatable
+            e.preventDefault();
+            table.DataTable().columns.adjust();
+
+            // table.columns.adjust().ajax.url(urlRequest).load();
+        })
+    });
+</script>
+{% endblock%}

@@ -13,6 +13,7 @@ import pathlib
 import re
 import json
 import time
+import shutil
 from asyncio.windows_events import NULL
 from distutils.command.upload import upload
 from itertools import count
@@ -29,6 +30,9 @@ from PIL import Image
 from io import BytesIO
 from werkzeug.utils import secure_filename
 from province import province_th
+from type_arr import type_arr
+from brand_arr import brand_arr
+from color_arr import color_arr
 from thefuzz import fuzz, process
 from pathlib import Path
 # from flask import Flask
@@ -52,19 +56,19 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 # ? MySQL setup
-# conn = pymysql.connect(host='localhost',
-#                        user='root',
-#                        passwd='',
-#                        db='flask'
-#                        #    cursorclass=pymysql.cursors.DictCursor
-#                        )
-conn = pymysql.connect(host='sql.freedb.tech',
-                       user='freedb_pnvttk',
-                       passwd='d5*cJtFdQXSUkcQ',
-                       db='freedb_pnvttk_flask',
-                       port=3306
+conn = pymysql.connect(host='localhost',
+                       user='root',
+                       passwd='',
+                       db='flask'
                        #    cursorclass=pymysql.cursors.DictCursor
                        )
+# conn = pymysql.connect(host='sql.freedb.tech',
+#                        user='freedb_pnvttk',
+#                        passwd='d5*cJtFdQXSUkcQ',
+#                        db='freedb_pnvttk_flask',
+#                        port=3306
+#                        #    cursorclass=pymysql.cursors.DictCursor
+#                        )
 
 
 # ? Local custom model
@@ -180,16 +184,48 @@ def mask_image():
     # ? if results have any detection object.
     # ? Loop to get only class name
     # ? array of check easyocr
-    ocr_txt = []
+    ocr_txt = {}
     # ? json to push to frontend
-    json_ocr_txt = []
+    json_ocr_txt = {}
     if len(info) != 0:
 
         # print("[INFO] : results name")
         # print(info)
         i = 0
         box_path = None
+        car_type = None
+        car_color = None
+        car_brand = None
+
         for result in info:
+            # print("check other variabel")
+            # print("|")
+            # print(result['name'])
+
+            # !
+            # if any(item == result['name'] for item in brand_arr):
+            #     car_brand = result['name']
+            # else:
+            #     car_brand = None
+            # if any(item == result['name'] for item in type_arr):
+            #     car_type = result['name']
+            # else:
+            #     car_type = None
+            # if any(item == result['name'] for item in color_arr):
+            #     car_color = result['name']
+            # else:
+            #     car_color = None
+
+            # print("check other variabel")
+            # print("|")
+            # print(car_type)
+            # print(car_color)
+            # print(car_brand)
+            # print("|")
+            # !
+
+            # print("|")
+            getClass_name = result['name']
 
             # ? Get class name from for loop
             getClass_name = result['name']
@@ -203,8 +239,10 @@ def mask_image():
                 results.crop(save_dir="results/" + new_name)
 
                 # ? temp box path to access to crop image
-                box_path = str("./results/" + new_name + '/image0.jpg')
-                # print(box_path)
+                box_path = str("./results/" + new_name +
+                               '/image0.jpg')
+                print("box-path")
+                print(box_path)
 
                 # ? temp crop path to access to crop image
                 crop_path = new_name + '/crops/Plate/'
@@ -222,6 +260,8 @@ def mask_image():
                 img_ocr = str("./results/" + crop_path +
                               'image' + str(i) + '.jpg')
 
+                # box_path = str("./results/" + new_name + '/image0.jpg')
+
                 # print("[INFO] path for ocr")
                 # print(img_ocr)
 
@@ -229,64 +269,84 @@ def mask_image():
                 eOCR = EASY_OCR.readtext(str(img_ocr), detail=0)
 
                 # ? storing extract text
-                ocr_txt.append(eOCR)
+                if i != int:
+                    i = int(i)
+                ocr_txt[i] = {}
+                ocr_txt[i] = eOCR
+
                 print("[INFO] EasyOCR TEXT : ")
                 print(ocr_txt)
+                print(type(ocr_txt))
                 print("|")
 
                 # ? Loop to check string from extract text
-                for txt in eOCR:
+                for i in ocr_txt:
+                    json_ocr_txt[i] = {}
+                    json_ocr_txt[i]["plate"] = None
+                    json_ocr_txt[i]["province"] = None
+                    for txt in ocr_txt[i]:
 
-                    # ? if txt have number in it
-                    if contains_number(txt):
+                        # ? if txt have number in it
+                        if contains_number(txt):
 
-                        # ? remove special character
-                        r = re.compile('[@_!#$%^&*`()[];:<>?/\|}{~:]')
-                        re_txt = r.sub('', str(txt))
-                        re_txt2 = re.sub(r"[\[\]\:\|\!\`\&]", '', re_txt)
+                            print("start at : " + txt + " from : ")
+                            # ? remove special character
+                            r = re.compile('[@_!#$%^&*`()[];:<>?/\|}{~:]')
+                            re_txt = r.sub('', str(txt))
+                            re_txt2 = re.sub(r"[\[\]\:\|\!\`\&]", '', re_txt)
 
-                        print("[INFO] Detect number in (" + txt + ")")
-                        print("|Remove speacial chareater to (" + re_txt2 + ")")
+                            print("[INFO] Detect number in (" + txt + ")")
+                            print("|Remove speacial chareater to (" + re_txt2 + ")")
 
-                        if len(re_txt2) - re_txt2.count(' ') < 2:
-
-                            print("[INFO] Detect number have lenth less that 4")
-                            print("|Remove this from append")
-                            print("|")
+                            if len(re_txt2) - re_txt2.count(' ') < 2:
+                                print(
+                                    "[INFO] Detect number have lenth less that 4")
+                                print("|Remove this from append")
+                                print("|")
+                            else:
+                                print("|")
+                                # ? append key and value to json object
+                                plate_dict = re_txt2
+                                json_ocr_txt[i]["plate"] = plate_dict
 
                         else:
 
-                            print("|")
+                            # ? remove specaial and english charater
+                            re_txt = re.sub('[A-Za-z]+', '', txt)
 
-                            # ? append key and value to json object
-                            json_ocr_txt.append({'plate': re_txt2})
+                            print(
+                                "[INFO] Remove special char from text : " + re_txt)
 
-                    else:
+                            # ? fuzzy text looking for similiar from province_th
+                            # fuzzytxt = process.extract(
+                            #     str(re_txt), province_th, limit=2, scorer=fuzz.token_sort_ratio)
+                            fuzzytxt = fuzzy(re_txt)
 
-                        # ? remove specaial and english charater
-                        re_txt = re.sub('[A-Za-z]+', '', txt)
+                            if fuzzytxt == NULL:
+                                print(
+                                    "[INFO] Sorting Text for (" + str(txt) + ") : ")
+                                print(fuzzytxt)
+                                print("|")
 
-                        print("[INFO] Remove special char from text : " + re_txt)
+                                # ? append key and value to json object
+                                province_dict = None
+                                json_ocr_txt[i]["province"] = province_dict
 
-                        # ? fuzzy text looking for similiar from province_th
-                        # fuzzytxt = process.extract(
-                        #     str(re_txt), province_th, limit=2, scorer=fuzz.token_sort_ratio)
-                        fuzzytxt = fuzzy(re_txt)
+                            else:
+                                print(
+                                    "[INFO] Sorting Text for (" + str(txt) + ") : ")
+                                print(fuzzytxt)
+                                print("|")
 
-                        if fuzzytxt == NULL:
-                            print("[INFO] Sorting Text for (" + str(txt) + ") : ")
-                            print(fuzzytxt)
-                            print("|")
+                                # ? append key and value to json object
+                                province_dict = fuzzytxt[0][0]
+                                json_ocr_txt[i]["province"] = province_dict
 
-                            # ? append key and value to json object
-                            json_ocr_txt.append({'province': NULL})
-                        else:
-                            print("[INFO] Sorting Text for (" + str(txt) + ") : ")
-                            print(fuzzytxt)
-                            print("|")
-
-                            # ? append key and value to json object
-                            json_ocr_txt.append({'province': fuzzytxt[0][0]})
+                    # !
+                    # json_ocr_txt[i]["brand"] = car_brand
+                    # json_ocr_txt[i]["type"] = car_type
+                    # json_ocr_txt[i]["color"] = car_color
+                    # !
 
                 # ? add 1 i = 1
                 i = int(i)+1
@@ -335,62 +395,73 @@ def sendtoDB():
     # ? Get ajax payload
     if request.method == "POST":
         # ? Get json
-        data = request.json
+        data_json = request.json
 
         print("[INFO] GET DATA FROM FRONTEND")
         print("|")
         # print(type(data))
+        # print(data)
 
-        # ? convert json to object
-        # data = json.loads(data)
-        plate = data['plate']
-        province = data['province']
-        brand = data['brand']
-        type = data['type']
-        color = data['color']
+        # quit()
 
-        plate.replace(' ', '\n')
-        province.replace(' ', '\n')
+        for data in data_json:
 
-        print(data['image'])
-        random_p = uuid.uuid4().hex
+            # ? convert json to object
+            # data = json.loads(data)
+            plate = data['plate']
+            province = data['province']
+            brand = data['brand']
+            car_type = data['type']
+            color = data['color']
 
-        print(Path(data['image']).rename(
-            "./static/upload/" + random_p + ".jpg"))
-        image_uploda = random_p + ".jpg"
+            plate.replace(' ', '\n')
+            province.replace(' ', '\n')
 
-        if plate == "":
-            plate = None
-        if province == "":
-            province = None
-        if brand == "":
-            brand = None
-        if type == "":
-            type = None
-        if color == "":
-            color = None
+            print(data['image'])
+            random_p = uuid.uuid4().hex
 
-        now = datetime.now()  # current date and time
+            # print(Path(data['image']).rename(
+            #     "./static/upload/" + random_p + ".jpg"))
+            # image_uploda = random_p + ".jpg"
 
-        # year = now.strftime("%Y")
-        # # print("year:", year)
-        # month = now.strftime("%m")
-        # # print("month:", month)
-        # day = now.strftime("%d")
-        # # print("day:", day)
-        # time = now.strftime("%H:%M:%S")
-        # # print("time:", time)
+            original = data['image']
+            target = "./static/upload/" + random_p + ".jpg"
+            image_uploda = target
 
-        date_time = now.strftime("%m/%d/%Y, %H:%M")
-        # print("date and time:", date_time)
+            shutil.copyfile(original, target)
 
-        upload_date = date_time
+            if plate == "":
+                plate = None
+            if province == "":
+                province = None
+            if brand == "":
+                brand = None
+            if car_type == "":
+                car_type = None
+            if color == "":
+                color = None
 
-        # CURRENT_TIMESTAMP()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                       (plate, province, brand, type, color, upload_date, image_uploda))
-        conn.commit()
+            now = datetime.now()  # current date and time
+
+            # year = now.strftime("%Y")
+            # # print("year:", year)
+            # month = now.strftime("%m")
+            # # print("month:", month)
+            # day = now.strftime("%d")
+            # # print("day:", day)
+            # time = now.strftime("%H:%M:%S")
+            # # print("time:", time)
+
+            date_time = now.strftime("%m/%d/%Y, %H:%M")
+            # print("date and time:", date_time)
+
+            upload_date = date_time
+
+            # CURRENT_TIMESTAMP()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                           (plate, province, brand, car_type, color, upload_date, image_uploda))
+            conn.commit()
 
         return jsonify({'status': 'success'})
     return ('', 204)
