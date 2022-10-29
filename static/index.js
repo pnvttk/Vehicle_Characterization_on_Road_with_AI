@@ -174,7 +174,7 @@ window.onload = () => {
                             }
                         })
 
-                        // console.log(province_arr)
+                        console.log(province_arr)
 
                         // ? check if province text == 0
                         if (province_arr[0] == 0) {
