@@ -124,232 +124,258 @@ def mask_image():
         print("\r")
 
     # ? Get image from POST
-    file = request.files["image"]
+    # file = request.files["image"]
+    file_arr = request.files.getlist('image')
 
-    # ? Create temp unique directory
-    new_name = generate_custom_name(file.filename)
+    print(type(file_arr))
+    print(file_arr)
+    # print(type(file))
+    # print(file.filename)
 
-    # ? Send img to model
-    img_bytes = file.read()
-    img = Image.open(io.BytesIO(img_bytes))
-    results = model([img])
+    payload = {}
+    for loop_time, file in enumerate(file_arr):
+        # print(file)
+        # quit()
 
-    # ? results after detection
-    results.render()  # updates results.imgs with boxes and labels
-    # results.save(save_dir="results/" + new_name)
-    # results.save(save_dir="results/test.jpg")
+        print("====================================================================")
 
-    # ? Count class number from detection
-    # results.pandas().xyxy[0]  # Pandas DataFrame
-    # print("[INFO] : Pandas Results")
-    # print(results.pandas().xyxy[0])
-    print("[INFO] : Count class name")
-    print(results.pandas().xyxy[0].value_counts('name'))
-    count_result = results.pandas().xyxy[0].value_counts('name')
+        # ? Create temp unique directory
+        new_name = generate_custom_name(file.filename)
 
-    # # Get access to class name
-    # ? info for array of results
-    info = results.pandas().xyxy[0].to_dict(orient='records')
+        # ? Send img to model
+        img_bytes = file.read()
+        img = Image.open(io.BytesIO(img_bytes))
+        results = model([img])
 
-    # ? if results have any detection object.
-    # ? Loop to get only class name
-    # ? array of check easyocr
-    ocr_txt = {}
-    # ? json to push to frontend
-    json_ocr_txt = {}
-    if len(info) != 0:
+        # ? results after detection
+        results.render()  # updates results.imgs with boxes and labels
+        # results.save(save_dir="results/" + new_name)
+        # results.save(save_dir="results/test.jpg")
 
-        # print("[INFO] : results name")
-        # print(info)
-        i = 0
-        box_path = None
-        car_type = None
-        car_color = None
-        car_brand = None
+        # ? Count class number from detection
+        # results.pandas().xyxy[0]  # Pandas DataFrame
+        # print("[INFO] : Pandas Results")
+        # print(results.pandas().xyxy[0])
+        print("[INFO] : Count class name")
+        print(results.pandas().xyxy[0].value_counts('name'))
+        count_result = results.pandas().xyxy[0].value_counts('name')
 
-        for result in info:
-            # print("check other variabel")
-            # print("|")
-            # print(result['name'])
+        # # Get access to class name
+        # ? info for array of results
+        info = results.pandas().xyxy[0].to_dict(orient='records')
 
-            # !
-            # if any(item == result['name'] for item in brand_arr):
-            #     car_brand = result['name']
-            # else:
-            #     car_brand = None
-            # if any(item == result['name'] for item in type_arr):
-            #     car_type = result['name']
-            # else:
-            #     car_type = None
-            # if any(item == result['name'] for item in color_arr):
-            #     car_color = result['name']
-            # else:
-            #     car_color = None
+        # ? if results have any detection object.
+        # ? Loop to get only class name
+        # ? array of check easyocr
+        ocr_txt = {}
+        # ? json to push to frontend
+        json_ocr_txt = {}
+        if len(info) != 0:
 
-            # print("check other variabel")
-            # print("|")
-            # print(car_type)
-            # print(car_color)
-            # print(car_brand)
-            # print("|")
-            # !
+            # print("[INFO] : results name")
+            # print(info)
+            i = 0
+            box_path = None
+            car_type = None
+            car_color = None
+            car_brand = None
 
-            # print("|")
-            getClass_name = result['name']
+            for result in info:
+                # print("check other variabel")
+                # print("|")
+                # print(result['name'])
 
-            # ? Get class name from for loop
-            getClass_name = result['name']
+                # !
+                # if any(item == result['name'] for item in brand_arr):
+                #     car_brand = result['name']
+                # else:
+                #     car_brand = None
+                # if any(item == result['name'] for item in type_arr):
+                #     car_type = result['name']
+                # else:
+                #     car_type = None
+                # if any(item == result['name'] for item in color_arr):
+                #     car_color = result['name']
+                # else:
+                #     car_color = None
 
-            # ? If class == Plate crop image for EasyOCR
-            if getClass_name == 'Plate':
+                # print("check other variabel")
+                # print("|")
+                # print(car_type)
+                # print(car_color)
+                # print(car_brand)
+                # print("|")
+                # !
 
-                # print('[INFO] Croping image.')
+                # print("|")
+                getClass_name = result['name']
 
-                # ? crop plate and save in unique directory
-                results.crop(save_dir="results/" + new_name)
+                # ? Get class name from for loop
+                getClass_name = result['name']
 
-                # ? temp box path to access to crop image
-                box_path = str("./results/" + new_name +
-                               '/image0.jpg')
+                # ? If class == Plate crop image for EasyOCR
+                if getClass_name == 'Plate':
 
-                # ? temp crop path to access to crop image
-                crop_path = new_name + '/crops/Plate/'
+                    # print('[INFO] Croping image.')
 
-                # ? loop to check new directory
-                for f in os.listdir("./results/"):
-                    j = ""
-                    # print("[TEMP PATH] = "+f)
+                    # ? crop plate and save in unique directory
+                    results.crop(save_dir="results/" + new_name)
 
-                # ! Random 00 bug fix
-                if i == '00':
-                    i = '0'
+                    # ? temp box path to access to crop image
+                    box_path = str("./results/" + new_name +
+                                   '/image0.jpg')
 
-                # ? path of image to use for easyocr
-                img_ocr = str("./results/" + crop_path +
-                              'image' + str(i) + '.jpg')
+                    # ? temp crop path to access to crop image
+                    crop_path = new_name + '/crops/Plate/'
 
-                # print("[INFO] path for ocr")
-                # print(img_ocr)
+                    # ? loop to check new directory
+                    for f in os.listdir("./results/"):
+                        j = ""
+                        # print("[TEMP PATH] = "+f)
 
-                # ? Extract text from Plate image
-                eOCR = EASY_OCR.readtext(str(img_ocr), detail=0)
+                    # ! Random 00 bug fix
+                    if i == '00':
+                        i = '0'
 
-                # ? storing extract text
-                if i != int:
-                    i = int(i)
-                ocr_txt[i] = {}
-                ocr_txt[i] = eOCR
+                    # ? path of image to use for easyocr
+                    img_ocr = str("./results/" + crop_path +
+                                  'image' + str(i) + '.jpg')
 
-                print("[INFO] EasyOCR TEXT : ")
-                print(ocr_txt)
-                print(type(ocr_txt))
-                print("|")
+                    # print("[INFO] path for ocr")
+                    # print(img_ocr)
 
-                # ? Loop to check string from extract text
-                for i in ocr_txt:
-                    json_ocr_txt[i] = {}
-                    json_ocr_txt[i]["plate"] = None
-                    json_ocr_txt[i]["province"] = None
-                    for txt in ocr_txt[i]:
+                    # ? Extract text from Plate image
+                    eOCR = EASY_OCR.readtext(str(img_ocr), detail=0)
 
-                        # ? if txt have number in it
-                        if contains_number(txt):
+                    # ? storing extract text
+                    if i != int:
+                        i = int(i)
+                    ocr_txt[i] = {}
+                    ocr_txt[i] = eOCR
 
-                            print("start at : " + txt + " from : ")
-                            # ? remove special character
-                            r = re.compile('[@_!#$%^&*`()[];:<>?/\|}{~:]')
-                            re_txt = r.sub('', str(txt))
-                            re_txt2 = re.sub(r"[\[\]\:\|\!\`\&]", '', re_txt)
+                    print("[INFO] EasyOCR TEXT : ")
+                    print(ocr_txt)
+                    print(type(ocr_txt))
+                    print("|")
 
-                            print("[INFO] Detect number in (" + txt + ")")
-                            print("|Remove speacial chareater to (" + re_txt2 + ")")
+                    # ? Loop to check string from extract text
+                    for i in ocr_txt:
+                        json_ocr_txt[i] = {}
+                        json_ocr_txt[i]["plate"] = None
+                        json_ocr_txt[i]["province"] = None
+                        for txt in ocr_txt[i]:
 
-                            if len(re_txt2) - re_txt2.count(' ') < 2:
+                            # ? if txt have number in it
+                            if contains_number(txt):
+
+                                print("start at : " + txt + " from : ")
+                                # ? remove special character
+                                r = re.compile('[@_!#$%^&*`()[];:<>?/\|}{~:]')
+                                re_txt = r.sub('', str(txt))
+                                re_txt2 = re.sub(
+                                    r"[\[\]\:\|\!\`\&]", '', re_txt)
+
+                                print("[INFO] Detect number in (" + txt + ")")
                                 print(
-                                    "[INFO] Detect number have lenth less that 4")
-                                print("|Remove this from append")
-                                print("|")
-                            else:
-                                print("|")
-                                # ? append key and value to json object
-                                plate_dict = re_txt2
-                                json_ocr_txt[i]["plate"] = plate_dict
+                                    "|Remove speacial chareater to (" + re_txt2 + ")")
 
-                        else:
-
-                            # ? remove specaial and english charater
-                            re_txt = re.sub('[A-Za-z]+', '', txt)
-
-                            print(
-                                "[INFO] Remove special char from text : " + re_txt)
-
-                            # ? fuzzy text looking for similiar from province_th
-                            fuzzytxt = fuzzy(re_txt)
-
-                            if fuzzytxt == NULL:
-                                print(
-                                    "[INFO] Sorting Text for (" + str(txt) + ") : ")
-                                print(fuzzytxt)
-                                print("|")
-
-                                # ? append key and value to json object
-                                province_dict = None
-                                json_ocr_txt[i]["province"] = province_dict
+                                if len(re_txt2) - re_txt2.count(' ') < 2:
+                                    print(
+                                        "[INFO] Detect number have lenth less that 4")
+                                    print("|Remove this from append")
+                                    print("|")
+                                else:
+                                    print("|")
+                                    # ? append key and value to json object
+                                    plate_dict = re_txt2
+                                    json_ocr_txt[i]["plate"] = plate_dict
 
                             else:
+
+                                # ? remove specaial and english charater
+                                re_txt = re.sub('[A-Za-z]+', '', txt)
+
                                 print(
-                                    "[INFO] Sorting Text for (" + str(txt) + ") : ")
-                                print(fuzzytxt)
-                                print("|")
+                                    "[INFO] Remove special char from text : " + re_txt)
 
-                                # ? append key and value to json object
-                                province_dict = fuzzytxt[0][0]
-                                json_ocr_txt[i]["province"] = province_dict
+                                # ? fuzzy text looking for similiar from province_th
+                                fuzzytxt = fuzzy(re_txt)
 
-                    # !
-                    # json_ocr_txt[i]["brand"] = car_brand
-                    # json_ocr_txt[i]["type"] = car_type
-                    # json_ocr_txt[i]["color"] = car_color
-                    # !
+                                if fuzzytxt == NULL:
+                                    print(
+                                        "[INFO] Sorting Text for (" + str(txt) + ") : ")
+                                    print(fuzzytxt)
+                                    print("|")
 
-                # ? add 1 i = 1
-                i = int(i)+1
+                                    # ? append key and value to json object
+                                    province_dict = None
+                                    json_ocr_txt[i]["province"] = province_dict
+
+                                else:
+                                    print(
+                                        "[INFO] Sorting Text for (" + str(txt) + ") : ")
+                                    print(fuzzytxt)
+                                    print("|")
+
+                                    # ? append key and value to json object
+                                    province_dict = fuzzytxt[0][0]
+                                    json_ocr_txt[i]["province"] = province_dict
+
+                        # !
+                        # json_ocr_txt[i]["brand"] = car_brand
+                        # json_ocr_txt[i]["type"] = car_type
+                        # json_ocr_txt[i]["color"] = car_color
+                        # !
+
+                    # ? add 1 i = 1
+                    i = int(i)+1
+                    # print(i)
+
+                # ? because image1 not exist
+                # ? add 1 i = 2
+                if i == 1:
+                    i += 1
                 # print(i)
+                #  ? then add 0 in front of i => i = 02
+                i = str(i).zfill(2)
+                # print(str(i))
 
-            # ? because image1 not exist
-            # ? add 1 i = 2
-            if i == 1:
-                i += 1
-            # print(i)
-            #  ? then add 0 in front of i => i = 02
-            i = str(i).zfill(2)
-            # print(str(i))
+        # ? if results not detect any thing
+        else:
+            # ? return alert msg to ajax
+            return jsonify({'alert': "alert('error')"})
 
-    # ? if results not detect any thing
-    else:
-        # ? return alert msg to ajax
-        return jsonify({'alert': "alert('error')"})
+        print("[PAYLOAD] : ", json_ocr_txt)
+        print("|")
 
-    print("[PAYLOAD] : ", json_ocr_txt)
-    print("|")
+        rows = 5
+        for i in range(rows + 1, 0, -1):
+            # nested reverse loop
+            for j in range(0, i - 1):
+                # display star
+                print("*", end=' ')
+            print(" ")
 
-    rows = 5
-    for i in range(rows + 1, 0, -1):
-        # nested reverse loop
-        for j in range(0, i - 1):
-            # display star
-            print("*", end=' ')
-        print(" ")
+        # ? make image to base64 then send to ajax
+        for img in results.ims:
+            buffered = BytesIO()
+            img_base64 = Image.fromarray(img)
+            img_base64.save(buffered, format="JPEG")
+            b64str = (base64.b64encode(buffered.getvalue()).decode(
+                'utf-8'))  # base64 encoded image with results
 
-    # ? make image to base64 then send to ajax
-    for img in results.ims:
-        buffered = BytesIO()
-        img_base64 = Image.fromarray(img)
-        img_base64.save(buffered, format="JPEG")
-        b64str = (base64.b64encode(buffered.getvalue()).decode(
-            'utf-8'))  # base64 encoded image with results
+        final_payload = {
+            'status': str(b64str),
+            'count_result': str(count_result),
+            'json_ocr_txt': json_ocr_txt,
+            'box_path': str(box_path)
+        }
 
-    return jsonify({'status': str(b64str), 'count_result': str(count_result), 'json_ocr_txt': json_ocr_txt, 'box_path': str(box_path)})
+        payload[loop_time] = final_payload
+
+        # print(loop_time)
+
+    return jsonify(payload)
 
 
 # ? Upload to DB

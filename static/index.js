@@ -41,6 +41,64 @@ color_arr = ["Black",
     "Brown",]
 
 window.onload = () => {
+
+    //Check File API support
+    if (window.File && window.FileList && window.FileReader) {
+        var filesInput = document.getElementById("imageinput");
+
+        filesInput.addEventListener("change", function (event) {
+
+            //FileList object
+            var files = event.target.files;
+            var output = document.getElementById("result");
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+
+                //Only pics
+                if (!file.type.match('image'))
+                    continue;
+
+                var picReader = new FileReader();
+
+                picReader.addEventListener("load", function (event) {
+
+                    var picFile = event.target;
+
+                    img_div = document.createElement("div");
+
+                    output.append(img_div)
+
+                    img_a = document.createElement("a")
+                    img_a.setAttribute('href', picFile.result)
+                    img_a.setAttribute('data-featherlight', "image")
+
+                    img_div.append(img_a)
+
+                    img_arr = document.createElement("img")
+                    img_arr.className = "thumbnail mt-3"
+                    img_arr.style = 'width: 80% ; height:auto;'
+                    img_arr.name = file.name
+                    img_arr.id = "imageBox"
+                    img_arr.setAttribute("src", picFile.result)
+
+                    img_a.append(img_arr)
+
+                    output.insertBefore(img_div, null);
+
+                });
+
+                //Read the image
+                picReader.readAsDataURL(file);
+            }
+
+        });
+    }
+    else {
+        console.log("Your browser does not support File API");
+    }
+
+
     $('#sendbutton').click(() => {
 
         // ? image preview
@@ -61,12 +119,40 @@ window.onload = () => {
         // ? Get image input
         input = $('#imageinput')[0]
 
+        input_z = $('#imageinput')
+
+        output = $('#result');
+
+        // ? image preview
+        input_z.click(() => {
+            // ? set text field value to empty
+            output.empty()
+            console.log("clear imagebox")
+        })
+
         // ? if get input
         if (input.files && input.files[0]) {
 
             // ? payload to backend
             let formData = new FormData();
-            formData.append('image', input.files[0]);
+            fileList = input.files
+            // formData.append('image', input.files);
+
+            inpFile = document.getElementById('imageinput')
+
+            // console.log(fileList)
+
+            for (const file of inpFile.files) {
+                formData.append("image", file)
+            }
+
+            // console.log("end for")
+
+            for (const [key, value] of formData) {
+                // console.log(`key : ${key}`)
+                // console.log(`value : ${value}`)
+            }
+
 
             // ? ajax send to backend
             $.ajax({
@@ -102,170 +188,176 @@ window.onload = () => {
                     // console.log("upload success");
                     // console.log(data);
 
-                    // ? get data from flask
-                    a_msg = data['alert']
-                    bytestring = data['status']
-                    ocr_txt = data['json_ocr_txt']
-                    box_path = data['box_path']
-                    count_result = data['count_result']
+                    for (i in data) {
 
-                    // * check
-                    // console.log("a_msg : ", a_msg)
-                    // console.log("bytestring : ", bytestring)
-                    // console.log("ocr_txt : ", ocr_txt)
-                    // console.log(typeof ocr_txt)
-                    // console.log("count_result : ", count_result)
+                        // console.log(i)
+                        // console.log(data[i])
 
-                    // ? if get image
-                    if (bytestring != undefined) {
+                        // ? get data from flask
+                        a_msg = data[i]['alert']
+                        bytestring = data[i]['status']
+                        ocr_txt = data[i]['json_ocr_txt']
+                        box_path = data[i]['box_path']
+                        count_result = data[i]['count_result']
 
                         // * check
-                        // console.log("box_path :", box_path)
+                        // console.log("a_msg : ", a_msg)
+                        // console.log("bytestring : ", bytestring)
+                        // console.log("ocr_txt : ", ocr_txt)
+                        // console.log(typeof ocr_txt)
+                        // console.log("count_result : ", count_result)
 
-                        // ? replace image with new image from backend
-                        abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
-                        imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
+                        // ? if get image
+                        if (bytestring != undefined) {
 
-                        // ? alert msg
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Successfully',
-                            text: 'Obejct Detection have been compleate!',
-                        })
-                    }
+                            // * check
+                            // console.log("box_path :", box_path)
 
-                    // ? if get ocr text
-                    if (ocr_txt != undefined) {
+                            // ? replace image with new image from backend
+                            abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
+                            imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
 
-                        // ? show upload to db button
-                        document.getElementById('sendtoDB').style.display = "block";
+                            // ? alert msg
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Successfully',
+                                text: 'Obejct Detection have been compleate!',
+                            })
+                        }
 
-                        // ? empty array 
-                        plate_arr = ""
-                        province_arr = ""
+                        // ? if get ocr text
+                        if (ocr_txt != undefined) {
 
-                        // ! new func
-                        count = 1
-                        for (i in ocr_txt) {
+                            // ? show upload to db button
+                            document.getElementById('sendtoDB').style.display = "block";
 
-                            // *check
-                            // console.log(i + ocr_txt[i])
+                            // ? empty array 
+                            plate_arr = ""
+                            province_arr = ""
 
-                            // ? create p element 
-                            p_elm = document.createElement("p")
+                            // ! new func
+                            count = 1
+                            for (i in ocr_txt) {
 
-                            // ? set text inside
-                            p_elm.innerHTML = "Car" + count + " :"
+                                // *check
+                                // console.log(i + ocr_txt[i])
 
-                            // ? append p element to id input_box
-                            input_box.append(p_elm)
+                                // ? create p element 
+                                p_elm = document.createElement("p")
 
-                            // ? Loop get all data from ocr_text
-                            for (key in ocr_txt[i]) {
+                                // ? set text inside
+                                p_elm.innerHTML = "Car" + count + " :"
 
-                                // * check
-                                // console.log(key + " : " + ocr_txt[i][key])
+                                // ? append p element to id input_box
+                                input_box.append(p_elm)
 
-                                if (key == "plate") {
-                                    input_val = ocr_txt[i][key]
-                                }
+                                // ? Loop get all data from ocr_text
+                                for (key in ocr_txt[i]) {
 
-                                if (key == "province") {
+                                    // * check
+                                    // console.log(key + " : " + ocr_txt[i][key])
 
-                                    // ? check if province text == null
-                                    if (ocr_txt[i][key] == null) {
-
-                                        input_val = "-"
-
-                                        Swal.fire({
-                                            icon: 'warning',
-                                            title: "Detect successfully.",
-                                            text: "But can't detect some text, Double check before process.",
-                                        })
-                                    } else {
+                                    if (key == "plate") {
                                         input_val = ocr_txt[i][key]
                                     }
+
+                                    if (key == "province") {
+
+                                        // ? check if province text == null
+                                        if (ocr_txt[i][key] == null) {
+
+                                            input_val = "-"
+
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: "Detect successfully.",
+                                                text: "But can't detect some text, Double check before process.",
+                                            })
+                                        } else {
+                                            input_val = ocr_txt[i][key]
+                                        }
+                                    }
+
+                                    // ? create div elemnt for input field
+                                    div_elm = document.createElement("div")
+
+                                    // ? class bootstap floating text
+                                    div_elm.setAttribute("Class", "form-floating");
+
+                                    // ? appaend to input_box
+                                    input_box.append(div_elm)
+
+                                    // ? create input element
+                                    input_elm = document.createElement('input')
+
+                                    // ? set attr
+                                    input_elm.type = "text";
+                                    input_elm.name = key + i;
+                                    input_elm.id = key;
+                                    // input_elm.id = "floatingInput"
+                                    input_elm.value = input_val
+                                    input_elm.className = "form-control mt-3 mb-3"
+
+                                    // ? append to div element
+                                    div_elm.append(input_elm)
+
+                                    // ? create label element
+                                    label_elm = document.createElement('label')
+
+                                    // ? set attr
+                                    label_elm.setAttribute("for", "floatingInput");
+                                    label_elm.innerHTML = key
+                                    label_elm.className = "text-dark"
+
+                                    // ? append to div element
+                                    div_elm.append(label_elm)
                                 }
-
-                                // ? create div elemnt for input field
-                                div_elm = document.createElement("div")
-
-                                // ? class bootstap floating text
-                                div_elm.setAttribute("Class", "form-floating");
-
-                                // ? appaend to input_box
-                                input_box.append(div_elm)
-
-                                // ? create input element
-                                input_elm = document.createElement('input')
-
-                                // ? set attr
-                                input_elm.type = "text";
-                                input_elm.name = key + i;
-                                input_elm.id = key;
-                                // input_elm.id = "floatingInput"
-                                input_elm.value = input_val
-                                input_elm.className = "form-control mt-3 mb-3"
-
-                                // ? append to div element
-                                div_elm.append(input_elm)
-
-                                // ? create label element
-                                label_elm = document.createElement('label')
-
-                                // ? set attr
-                                label_elm.setAttribute("for", "floatingInput");
-                                label_elm.innerHTML = key
-                                label_elm.className = "text-dark"
-
-                                // ? append to div element
-                                div_elm.append(label_elm)
+                                // ? increment count for car number
+                                count += 1
                             }
-                            // ? increment count for car number
-                            count += 1
                         }
-                    }
 
-                    // ? if get counts result 
-                    if (count_result != undefined) {
+                        // ? if get counts result 
+                        if (count_result != undefined) {
 
-                        // ? rearrange text
-                        c_result = count_result.toString().split("\g").join("\n")
-                        c_result = c_result.replace("name", "Results")
-                        c_result = c_result.replace("dtype: int64", "")
+                            // ? rearrange text
+                            c_result = count_result.toString().split("\g").join("\n")
+                            c_result = c_result.replace("name", "Results")
+                            c_result = c_result.replace("dtype: int64", "")
 
-                        // ? set text in cbox
-                        cbox.text(c_result)
+                            // ? set text in cbox
+                            cbox.text(c_result)
 
-                        // ? remove number for input name
-                        c_result = c_result.replace("Results", "")
-                        c_result_remove = c_result.replace(/[0-9]/g, '');
-                        c_result_remove = c_result_remove.replace('\t', '');
-                        c_result_remove = c_result_remove.replace(/\s/, '');
-                        c_result_remove = c_result_remove.replace(/^\s+|\s+$/gm, '');
+                            // ? remove number for input name
+                            c_result = c_result.replace("Results", "")
+                            c_result_remove = c_result.replace(/[0-9]/g, '');
+                            c_result_remove = c_result_remove.replace('\t', '');
+                            c_result_remove = c_result_remove.replace(/\s/, '');
+                            c_result_remove = c_result_remove.replace(/^\s+|\s+$/gm, '');
 
-                        // * check
-                        // console.log(c_result_remove)
+                            // * check
+                            // console.log(c_result_remove)
 
-                        // ? create new line 
-                        c_result_arr = c_result_remove.split("\n")
+                            // ? create new line 
+                            c_result_arr = c_result_remove.split("\n")
 
-                        // * check
-                        // console.log(c_result_arr)
-                    }
-
-                    // ? if alert msg is not set
-                    if (a_msg != undefined) {
-
-                        // ? alert err msg
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: "Object Detection have been failed! \n Look like there isn't car in this image",
-                        }).then(function () {
-                            location.reload();
+                            // * check
+                            // console.log(c_result_arr)
                         }
-                        );
+
+                        // ? if alert msg is not set
+                        if (a_msg != undefined) {
+
+                            // ? alert err msg
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: "Object Detection have been failed! \n Look like there isn't car in this image",
+                            }).then(function () {
+                                location.reload();
+                            }
+                            );
+                        }
                     }
                 }
             });
