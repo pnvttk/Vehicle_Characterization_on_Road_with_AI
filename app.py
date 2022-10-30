@@ -14,6 +14,7 @@ import re
 import json
 import time
 import shutil
+from sqlite3 import IntegrityError
 from asyncio.windows_events import NULL
 from distutils.command.upload import upload
 from itertools import count
@@ -39,20 +40,19 @@ from pathlib import Path
 from flask_ngrok import run_with_ngrok
 # from eOCR import main
 
+# ? Setup Flask
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-# run_with_ngrok(app)
 
 # ? DEFINING GLOBAL VARIABLE
 EASY_OCR = easyocr.Reader(['th'])  # initiating easyocr
 # ? OCR CONF
 OCR_TH = 0.2
 
-# ? Define temp path
-UPLOAD_FOLDER = './results'
+# ? Define temp path for store image, delete later
+results_folder = './results'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-# ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['results_folder'] = results_folder
 
 
 # ? MySQL setup
@@ -62,6 +62,7 @@ conn = pymysql.connect(host='localhost',
                        db='flask'
                        #    cursorclass=pymysql.cursors.DictCursor
                        )
+# ? Freedb MySQL
 # conn = pymysql.connect(host='sql.freedb.tech',
 #                        user='freedb_pnvttk',
 #                        passwd='d5*cJtFdQXSUkcQ',
@@ -94,47 +95,16 @@ def contains_number(string):
 
 # ? thefuzz string
 def fuzzy(string):
+    # ? get input string sorting with provinch_th
     fuzzy_sort = process.extract(
         str(string), province_th, limit=2, scorer=fuzz.token_sort_ratio)
 
+    # ? store conf
     fuzzy_sort_conf = fuzzy_sort[0][1]
     print("|---Sorting text Conf = " + str(fuzzy_sort_conf) + " ---")
 
-    # fuzzy_set = process.extract(
-    #     str(string), province_th, limit=2, scorer=fuzz.token_set_ratio)
-    # fuzzy_set_conf = fuzzy_set[0][1]
-    # print("|---Fuzzy Conf = " + str(fuzzy_set_conf) + " ---")
-
-    # fuzzy_partial = process.extract(
-    #     str(string), province_th, limit=2, scorer=fuzz.partial_ratio)
-    # fuzzy_partial_conf = fuzzy_partial[0][1]
-    # print("|---Fuzzy Conf = " + str(fuzzy_partial_conf) + " ---")
-
-    # fuzzy_ratio = process.extract(
-    #     str(string), province_th, limit=2, scorer=fuzz.ratio)
-    # fuzzy_ratio_conf = fuzzy_ratio[0][1]
-    # print("|---Fuzzy Conf = " + str(fuzzy_ratio_conf) + " ---")
-
-    # max_conf = max(fuzzy_set_conf, fuzzy_sort_conf,
-    #                #    fuzzy_partial_conf, fuzzy_ratio_conf)
-    #                )
-    # print("|** The most conf is : " + str(max_conf) + " **")
-
     if fuzzy_sort_conf >= 80:
         return fuzzy_sort
-        # if max_conf == fuzzy_sort_conf:
-        #     print("|** Using fuzzy_sort **")
-        #     return fuzzy_sort
-        # elif max_conf == fuzzy_set_conf:
-        #     print("|** Using fuzzy_set **")
-        #     return fuzzy_set
-
-        # elif max_conf == fuzzy_partial_conf:
-        #     print("|**Using fuzzy_partial**")
-        #     return fuzzy_partial
-        # elif max_conf == fuzzy_ratio:
-        #     print("|**Using fuzzy_ratio**")
-        #     return fuzzy_ratio
     else:
         fuzzy_text = NULL
         return fuzzy_text
@@ -241,8 +211,6 @@ def mask_image():
                 # ? temp box path to access to crop image
                 box_path = str("./results/" + new_name +
                                '/image0.jpg')
-                print("box-path")
-                print(box_path)
 
                 # ? temp crop path to access to crop image
                 crop_path = new_name + '/crops/Plate/'
@@ -259,8 +227,6 @@ def mask_image():
                 # ? path of image to use for easyocr
                 img_ocr = str("./results/" + crop_path +
                               'image' + str(i) + '.jpg')
-
-                # box_path = str("./results/" + new_name + '/image0.jpg')
 
                 # print("[INFO] path for ocr")
                 # print(img_ocr)
@@ -318,8 +284,6 @@ def mask_image():
                                 "[INFO] Remove special char from text : " + re_txt)
 
                             # ? fuzzy text looking for similiar from province_th
-                            # fuzzytxt = process.extract(
-                            #     str(re_txt), province_th, limit=2, scorer=fuzz.token_sort_ratio)
                             fuzzytxt = fuzzy(re_txt)
 
                             if fuzzytxt == NULL:
@@ -401,13 +365,12 @@ def sendtoDB():
         print("|")
         # print(type(data))
         # print(data)
-
         # quit()
 
+        # ? Loop through json
         for data in data_json:
 
             # ? convert json to object
-            # data = json.loads(data)
             plate = data['plate']
             province = data['province']
             brand = data['brand']
@@ -420,16 +383,18 @@ def sendtoDB():
             print(data['image'])
             random_p = uuid.uuid4().hex
 
+            # ! old method move image can't use with array of data
             # print(Path(data['image']).rename(
             #     "./static/upload/" + random_p + ".jpg"))
             # image_uploda = random_p + ".jpg"
 
+            # ? copy ./result/image to ./static/upload
             original = data['image']
             target = "./static/upload/" + random_p + ".jpg"
             image_uploda = target
-
             shutil.copyfile(original, target)
 
+            # ? if empty set to None
             if plate == "":
                 plate = None
             if province == "":
@@ -441,8 +406,10 @@ def sendtoDB():
             if color == "":
                 color = None
 
-            now = datetime.now()  # current date and time
+            # ? current date and time
+            now = datetime.now()
 
+            # * check log
             # year = now.strftime("%Y")
             # # print("year:", year)
             # month = now.strftime("%m")
@@ -452,16 +419,38 @@ def sendtoDB():
             # time = now.strftime("%H:%M:%S")
             # # print("time:", time)
 
+            # ? set format
             date_time = now.strftime("%m/%d/%Y, %H:%M")
             # print("date and time:", date_time)
-
+            # ? pass to variable
             upload_date = date_time
 
-            # CURRENT_TIMESTAMP()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                           (plate, province, brand, car_type, color, upload_date, image_uploda))
-            conn.commit()
+            # ? try catch when commit to database
+            try:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                               (plate, province, brand, car_type, color, upload_date, image_uploda))
+                conn.commit()
+                print("=======")
+                print("success")
+                print("=======")
+
+                # ? delete all folder in ./results
+                for filename in os.listdir(results_folder):
+                    file_path = os.path.join(results_folder, filename)
+                    try:
+                        if os.path.isfile(file_path) or os.path.islink(file_path):
+                            os.unlink(file_path)
+                        elif os.path.isdir(file_path):
+                            shutil.rmtree(file_path)
+                    except Exception as e:
+                        print('Failed to delete %s. Reason: %s' %
+                              (file_path, e))
+
+            except pymysql.IntegrityError:
+                print("=======")
+                print("failed")
+                print("=======")
 
         return jsonify({'status': 'success'})
     return ('', 204)
@@ -505,29 +494,7 @@ def api_table():
 # # ? datatable path
 @ app.route("/table", methods=['GET', 'POST'])
 def table():
-
-    # ? Get data from db
-    cur = conn.cursor()
-    cur.execute('SELECT plate FROM `detect_data`;')
-    plate_data = [item[0] for item in cur.fetchall()]
-    cur.execute('SELECT province_name FROM `province`;')
-    province_data = [item[0] for item in cur.fetchall()]
-    cur.execute('SELECT brand_name FROM `brand`;')
-    brand_data = [item[0] for item in cur.fetchall()]
-    cur.execute('SELECT type_name FROM `type`;')
-    type_data = [item[0] for item in cur.fetchall()]
-    cur.execute('SELECT color_name FROM `color`;')
-    color_data = [item[0] for item in cur.fetchall()]
-
-    # * check log
-    # print(plate_data)
-    # print(province_data)
-    # print(brand_data)
-    # print(type_data)
-    # print(color_data)
-
-    return render_template('table.html', plate_data=plate_data, province_data=province_data, brand_data=brand_data, type_data=type_data, color_data=color_data)
-    # return render_template('table_ajax.html')
+    return render_template('table.html')
 
 
 # ? Set Header

@@ -42,16 +42,20 @@ color_arr = ["Black",
 
 window.onload = () => {
     $('#sendbutton').click(() => {
-        // ? html element
+
+        // ? image preview
         imagebox = $('#imagebox')
+
+        // ? featherlight img popup
         abox = $('#abox')
+
+        // ? count result
         cbox = $('#cbox')
-        plateBox = $('#plateBox')
-        provinceBox = $('#provinceBox')
+
+        // ? input 
         input_box = $('#inputBox')
 
-        plateBox.val("")
-        provinceBox.val("")
+        // ? set text field value to empty
         input_box.empty()
 
         // ? Get image input
@@ -66,6 +70,7 @@ window.onload = () => {
 
             // ? ajax send to backend
             $.ajax({
+
                 url: "/detectObject",
                 type: "POST",
                 data: formData,
@@ -75,8 +80,10 @@ window.onload = () => {
 
                 // ? error handle
                 error: function (data) {
+
                     console.log("upload error", data);
                     console.log(data.getAllResponseHeaders());
+
                     // ? alert err msg
                     Swal.fire({
                         icon: 'error',
@@ -95,6 +102,7 @@ window.onload = () => {
                     // console.log("upload success");
                     // console.log(data);
 
+                    // ? get data from flask
                     a_msg = data['alert']
                     bytestring = data['status']
                     ocr_txt = data['json_ocr_txt']
@@ -129,29 +137,46 @@ window.onload = () => {
                     // ? if get ocr text
                     if (ocr_txt != undefined) {
 
+                        // ? show upload to db button
+                        document.getElementById('sendtoDB').style.display = "block";
+
                         // ? empty array 
                         plate_arr = ""
                         province_arr = ""
 
-
                         // ! new func
                         count = 1
                         for (i in ocr_txt) {
+
+                            // *check
                             // console.log(i + ocr_txt[i])
+
+                            // ? create p element 
                             p_elm = document.createElement("p")
+
+                            // ? set text inside
                             p_elm.innerHTML = "Car" + count + " :"
+
+                            // ? append p element to id input_box
                             input_box.append(p_elm)
 
+                            // ? Loop get all data from ocr_text
                             for (key in ocr_txt[i]) {
+
+                                // * check
                                 // console.log(key + " : " + ocr_txt[i][key])
+
                                 if (key == "plate") {
                                     input_val = ocr_txt[i][key]
-                                    // console.log(plate_arr[i])
                                 }
+
                                 if (key == "province") {
+
                                     // ? check if province text == null
                                     if (ocr_txt[i][key] == null) {
+
                                         input_val = "-"
+
                                         Swal.fire({
                                             icon: 'warning',
                                             title: "Detect successfully.",
@@ -159,16 +184,22 @@ window.onload = () => {
                                         })
                                     } else {
                                         input_val = ocr_txt[i][key]
-                                        // console.log(province_arr[i])
                                     }
                                 }
 
+                                // ? create div elemnt for input field
                                 div_elm = document.createElement("div")
+
+                                // ? class bootstap floating text
                                 div_elm.setAttribute("Class", "form-floating");
 
+                                // ? appaend to input_box
                                 input_box.append(div_elm)
 
+                                // ? create input element
                                 input_elm = document.createElement('input')
+
+                                // ? set attr
                                 input_elm.type = "text";
                                 input_elm.name = key + i;
                                 input_elm.id = key;
@@ -176,102 +207,56 @@ window.onload = () => {
                                 input_elm.value = input_val
                                 input_elm.className = "form-control mt-3 mb-3"
 
+                                // ? append to div element
                                 div_elm.append(input_elm)
 
+                                // ? create label element
                                 label_elm = document.createElement('label')
+
+                                // ? set attr
                                 label_elm.setAttribute("for", "floatingInput");
                                 label_elm.innerHTML = key
                                 label_elm.className = "text-dark"
 
+                                // ? append to div element
                                 div_elm.append(label_elm)
                             }
-
+                            // ? increment count for car number
                             count += 1
                         }
-                        document.getElementById('sendtoDB').style.display = "block";
-
-
-                        // // ? loop to spilt key 
-                        // ocr_txt.forEach(plate => {
-                        //     for (let key in plate) {
-
-                        //         // * check
-                        //         // console.log("For key in plate :")
-                        //         // console.log(`${key}: ${plate[key]}`)
-
-                        //         // ? get value
-                        //         ext_txt = `${plate[key]}`
-                        //         // ? remove special character
-                        //         remove_special_char = ext_txt.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
-
-                        //         // * test
-                        //         // console.log(remove_special_char)
-                        //         // new_arr.push(remove_special_char)
-
-                        //         // ? spilt and push to new arr
-                        //         if (`${key}` == "plate") {
-                        //             // console.log("For key in plate :")
-                        //             // console.log(`${key}: ${plate[key]}`)
-                        //             // plate_arr.push(`${plate[key]}`)
-                        //             plate_arr.push(remove_special_char)
-                        //         }
-                        //         if (`${key}` == "province") {
-                        //             // console.log(`${key}: ${plate[key]}`)
-                        //             province_arr.push(remove_special_char)
-                        //         }
-                        //     }
-                        // })
-
-                        // console.log(province_arr)
-
-                        // // ? check if province text == 0
-                        // if (province_arr[0] == 0) {
-                        //     Swal.fire({
-                        //         icon: 'warning',
-                        //         title: "Detect successfully.",
-                        //         text: "But can't detect some of text, Double check before process.",
-                        //     })
-                        // } else {
-                        //     province_result = province_arr.toString().split(",").join("\n")
-                        //     provinceBox.val(province_result)
-                        // }
-
-                        // // ? remove "," and create new line
-                        // plate_result = plate_arr.toString().split(",").join("\n")
-
-                        // // * check
-                        // // console.log(result_arr)
-
-                        // // console.log(province_result)
-
-                        // // ? set value in frontend
-                        // plateBox.val(plate_result)
-                        // // provinceBox.val(province_result)
-
                     }
 
                     // ? if get counts result 
                     if (count_result != undefined) {
+
+                        // ? rearrange text
                         c_result = count_result.toString().split("\g").join("\n")
                         c_result = c_result.replace("name", "Results")
                         c_result = c_result.replace("dtype: int64", "")
-                        // console.log(typeof c_result)
+
+                        // ? set text in cbox
                         cbox.text(c_result)
 
+                        // ? remove number for input name
                         c_result = c_result.replace("Results", "")
                         c_result_remove = c_result.replace(/[0-9]/g, '');
                         c_result_remove = c_result_remove.replace('\t', '');
                         c_result_remove = c_result_remove.replace(/\s/, '');
                         c_result_remove = c_result_remove.replace(/^\s+|\s+$/gm, '');
+
+                        // * check
                         // console.log(c_result_remove)
 
+                        // ? create new line 
                         c_result_arr = c_result_remove.split("\n")
 
+                        // * check
                         // console.log(c_result_arr)
                     }
 
                     // ? if alert msg is not set
                     if (a_msg != undefined) {
+
                         // ? alert err msg
                         Swal.fire({
                             icon: 'error',
@@ -289,24 +274,33 @@ window.onload = () => {
 
     $('#sendtoDB').click(() => {
 
-        var cbox = $('#cbox').val()
+        // ? get value
         box_path = box_path
         c_result_arr = c_result_arr
 
+        // ? empty arr for sorting
         sort_type = []
         sort_brand = []
         sort_color = []
+
+        // ? sorting c_result_arr
         c_result_arr.forEach(e => {
+
+            // ? sorting type
             type_arr.forEach(type => {
                 if (type == e) {
                     sort_type.push(e)
                 }
             });
+
+            // ? sorting brand
             brand_arr.forEach(brand => {
                 if (brand == e) {
                     sort_brand.push(e)
                 }
             })
+
+            // ? sorting color
             color_arr.forEach(color => {
                 if (color == e) {
                     sort_color.push(e)
@@ -314,32 +308,40 @@ window.onload = () => {
             });
         })
 
+        // ? from sorting create new line
         type = sort_type.toString().split(",").join("\n")
         brand = sort_brand.toString().split(",").join("\n")
         color = sort_color.toString().split(",").join("\n")
 
-
-
-
+        // ? get all input field in #input-form
         var input_form = document.querySelectorAll("#input-form input[type=text]")
 
+        // ? loop get all element inside div
         for (var i = 0, element; element = input_form[i++];) {
             if (element.value === "")
                 console.log("it's an empty textfield")
         }
 
+        // * check
         // console.log(input_form)
 
+        // ? empty input arr
         input_obj = []
+
+        // ? loop get only id, value
         for (i in input_form) {
             if (input_form[i]["id"] && input_form[i]["value"] != undefined) {
                 input_obj.push(input_form[i]["value"])
             }
         }
+
+        // * check
         // console.log(input_obj)
 
+        // ? empty arr
         arr = [];
 
+        // ? form input_obj create new data_arr
         for (var i = 0; i < input_obj.length; i += 2) {
             var obj = {};
             obj['plate'] = input_obj[i];
@@ -351,7 +353,10 @@ window.onload = () => {
             arr.push(obj);
         }
 
+        // * check
         console.log(arr);
+
+        // ? store arr in data 
         data = arr
 
         // data = []
@@ -359,6 +364,7 @@ window.onload = () => {
         //     data.push(i, arr[i])
         // }
 
+        // * check
         console.log(data);
         // data = {
         //     'plate': plateBox,
@@ -368,7 +374,6 @@ window.onload = () => {
         //     'color': color,
         //     'image': box_path
         // }
-
 
         $.ajax({
             url: "/sendtoDB",
@@ -382,9 +387,11 @@ window.onload = () => {
 
             // ? error handle
             error: function (response) {
+
                 console.log("upload error", response);
                 // console.log(response.getAllResponseHeaders());
                 // console.log(response.responseText)
+
                 // ? alert err msg
                 Swal.fire({
                     icon: 'error',
@@ -396,6 +403,7 @@ window.onload = () => {
                 );
             },
             success: function (response) {
+
                 console.log("upload success");
                 console.log(response);
 
@@ -413,121 +421,10 @@ window.onload = () => {
             },
         })
     })
-
-    // $('#sendtoDB').click(() => {
-
-
-    //     // for (var i = 0, element; element = elements[i++];) {
-    //     //     if (element.type === "text" && element.value === "")
-    //     //         console.log("it's an empty textfield")
-    //     //     console.log(element)
-    //     // }
-
-    //     // ? html element
-    //     var plateBox = $('#plateBox').val()
-    //     var provinceBox = $('#provinceBox').val()
-    //     var cbox = $('#cbox').val()
-    //     box_path = box_path
-    //     c_result_arr = c_result_arr
-
-    //     // * check
-    //     // console.log("plate box")
-    //     // console.log(plateBox)
-    //     // console.log("province box")
-    //     // console.log(provinceBox)
-
-    //     sort_type = []
-    //     sort_brand = []
-    //     sort_color = []
-    //     c_result_arr.forEach(e => {
-    //         type_arr.forEach(type => {
-    //             if (type == e) {
-    //                 sort_type.push(e)
-    //             }
-    //         });
-    //         brand_arr.forEach(brand => {
-    //             if (brand == e) {
-    //                 sort_brand.push(e)
-    //             }
-    //         })
-    //         color_arr.forEach(color => {
-    //             if (color == e) {
-    //                 sort_color.push(e)
-    //             }
-    //         });
-    //     })
-
-    //     type = sort_type.toString().split(",").join("\n")
-    //     brand = sort_brand.toString().split(",").join("\n")
-    //     color = sort_color.toString().split(",").join("\n")
-
-
-    //     // console.log(type)
-    //     // console.log(brand)
-    //     // console.log(color)
-
-    //     data = {
-    //         'plate': plateBox,
-    //         'province': provinceBox,
-    //         'brand': brand,
-    //         'type': type,
-    //         'color': color,
-    //         'image': box_path
-    //     }
-
-    //     // console.log(data)
-    //     // const json_data = JSON.stringify(data);
-    //     // console.log(json_data)
-
-    //     // ? ajax send to backend
-    //     $.ajax({
-    //         url: "/sendtoDB",
-    //         type: "POST",
-    //         contentType: 'application/json',
-    //         data: JSON.stringify(data),
-    //         dataType: 'json',
-    //         // cache: false,
-    //         // processData: false,
-    //         // contentType: false,
-
-    //         // ? error handle
-    //         error: function (response) {
-    //             console.log("upload error", response);
-    //             console.log(response.getAllResponseHeaders());
-    //             console.log(response.responseText)
-    //             // ? alert err msg
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Oops...',
-    //                 text: "Failed to push to database.",
-    //             }).then(function () {
-    //                 location.reload();
-    //             }
-    //             );
-    //         },
-    //         success: function (response) {
-    //             console.log("upload success");
-    //             console.log(response);
-
-    //             // ? alert msg
-    //             Swal.fire({
-    //                 icon: 'success',
-    //                 title: 'Successfully',
-    //                 text: 'Upload to database success!',
-    //                 footer: '<a href="/table">Go to Table page.</a>'
-
-    //             }).then(function () {
-    //                 location.reload();
-    //             }
-    //             );
-    //         },
-    //     })
-    // })
 };
 
-
-
 function readUrl(input) {
+
     // ? html elment
     imagebox = $('#imagebox')
     abox = $('#abox')
