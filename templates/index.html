@@ -66,8 +66,7 @@
                 <h2>Detect from a image.</h2>
                 <form id="form-files" method="post" enctype=multipart/form-data>
                     <div class="input-group mt-3">
-                        <input type="file" class="form-control" id="imageinput" type="file" name="image" multiple
-                            onchange="readUrl(this)">
+                        <input type="file" class="form-control" id="imageinput" type="file" name="image" multiple>
                         <button class="btn btn-primary" type="button" name="send" id="sendbutton">Detect</button>
                     </div>
                 </form>
@@ -76,10 +75,7 @@
                 {% endfor %}
                 <div className="pre_img" class="mt-3 d-flex justify-content-center">
                     <div class="text-center">
-                        <!-- <a href="" id="abox" data-featherlight="image"> -->
-                        <img id="imagebox" src="" class="img_responsive" style="width: 80% ; height:auto;" hidden>
                         <output id="result" />
-                        <!-- </a> -->
                     </div>
                 </div>
             </div>
@@ -91,7 +87,7 @@
                     Latin,
                     Chinese, Arabic, Devanagari, Cyrillic and etc.</p>
                 <div class="mt-3 d-flex justify-content-start">
-                    <div class="text-start">
+                    <div class="text-start" id="p_div">
                         <p id="cbox" style="white-space: pre-wrap;"></p>
                     </div>
                 </div>
