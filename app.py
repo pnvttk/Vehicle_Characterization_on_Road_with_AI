@@ -127,15 +127,11 @@ def mask_image():
     # file = request.files["image"]
     file_arr = request.files.getlist('image')
 
-    print(type(file_arr))
-    print(file_arr)
-    # print(type(file))
-    # print(file.filename)
-
+    # ? empty payload obj
     payload = {}
+
+    # ? loop all file and count time for index in obj
     for loop_time, file in enumerate(file_arr):
-        # print(file)
-        # quit()
 
         print("====================================================================")
 
@@ -181,31 +177,6 @@ def mask_image():
             car_brand = None
 
             for result in info:
-                # print("check other variabel")
-                # print("|")
-                # print(result['name'])
-
-                # !
-                # if any(item == result['name'] for item in brand_arr):
-                #     car_brand = result['name']
-                # else:
-                #     car_brand = None
-                # if any(item == result['name'] for item in type_arr):
-                #     car_type = result['name']
-                # else:
-                #     car_type = None
-                # if any(item == result['name'] for item in color_arr):
-                #     car_color = result['name']
-                # else:
-                #     car_color = None
-
-                # print("check other variabel")
-                # print("|")
-                # print(car_type)
-                # print(car_color)
-                # print(car_brand)
-                # print("|")
-                # !
 
                 # print("|")
                 getClass_name = result['name']
@@ -321,12 +292,6 @@ def mask_image():
                                     province_dict = fuzzytxt[0][0]
                                     json_ocr_txt[i]["province"] = province_dict
 
-                        # !
-                        # json_ocr_txt[i]["brand"] = car_brand
-                        # json_ocr_txt[i]["type"] = car_type
-                        # json_ocr_txt[i]["color"] = car_color
-                        # !
-
                     # ? add 1 i = 1
                     i = int(i)+1
                     # print(i)
@@ -364,6 +329,7 @@ def mask_image():
             b64str = (base64.b64encode(buffered.getvalue()).decode(
                 'utf-8'))  # base64 encoded image with results
 
+        # ? pass all variable in obj
         final_payload = {
             'status': str(b64str),
             'count_result': str(count_result),
@@ -371,6 +337,7 @@ def mask_image():
             'box_path': str(box_path)
         }
 
+        # ? store obj in array with index
         payload[loop_time] = final_payload
 
         # print(loop_time)
@@ -460,23 +427,25 @@ def sendtoDB():
                 print("=======")
                 print("success")
                 print("=======")
-
-                # ? delete all folder in ./results
-                for filename in os.listdir(results_folder):
-                    file_path = os.path.join(results_folder, filename)
-                    try:
-                        if os.path.isfile(file_path) or os.path.islink(file_path):
-                            os.unlink(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' %
-                              (file_path, e))
+                commit_status = True
 
             except pymysql.IntegrityError:
                 print("=======")
                 print("failed")
                 print("=======")
+
+        # ? delete all folder in ./results
+        if commit_status == True:
+            for filename in os.listdir(results_folder):
+                file_path = os.path.join(results_folder, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %s. Reason: %s' %
+                          (file_path, e))
 
         return jsonify({'status': 'success'})
     return ('', 204)

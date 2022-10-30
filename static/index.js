@@ -44,15 +44,20 @@ window.onload = () => {
 
     //Check File API support
     if (window.File && window.FileList && window.FileReader) {
+
+        // ? get file input 
         var filesInput = document.getElementById("imageinput");
 
         filesInput.addEventListener("change", function (event) {
 
-            //FileList object
+            // ? FileList object
             var files = event.target.files;
+
+            // ? div for preview
             var output = document.getElementById("result");
 
-            for (var i = 0; i < files.length; i++) {
+            // ? loop get image file
+            for (let i = 0; i < files.length; i++) {
                 var file = files[i];
 
                 //Only pics
@@ -63,31 +68,50 @@ window.onload = () => {
 
                 picReader.addEventListener("load", function (event) {
 
+                    // ? id for each image
+                    abox = String("abox" + i)
+                    imagebox = String("imagebox" + i)
+
+                    // * check
+                    // console.log(abox)
+                    // console.log(imagebox)
+
                     var picFile = event.target;
 
+                    // ? create new div
                     img_div = document.createElement("div");
 
+                    // ? appaned to preview div
                     output.append(img_div)
 
+                    // ? create popup
                     img_a = document.createElement("a")
+
+                    // ? set attr
                     img_a.setAttribute('href', picFile.result)
                     img_a.setAttribute('data-featherlight', "image")
+                    // img_a.setAttribute('name', file.name)
+                    img_a.setAttribute('id', abox)
 
+                    // ? append to img div
                     img_div.append(img_a)
 
+                    // ? create img tag
                     img_arr = document.createElement("img")
+
+                    // ? set attr
                     img_arr.className = "thumbnail mt-3"
                     img_arr.style = 'width: 80% ; height:auto;'
                     img_arr.name = file.name
-                    img_arr.id = "imageBox"
+                    img_arr.id = imagebox
                     img_arr.setAttribute("src", picFile.result)
 
+                    // ? append to a
                     img_a.append(img_arr)
 
-                    output.insertBefore(img_div, null);
+                    // output.insertBefore(img_div, null);
 
                 });
-
                 //Read the image
                 picReader.readAsDataURL(file);
             }
@@ -101,15 +125,6 @@ window.onload = () => {
 
     $('#sendbutton').click(() => {
 
-        // ? image preview
-        imagebox = $('#imagebox')
-
-        // ? featherlight img popup
-        abox = $('#abox')
-
-        // ? count result
-        cbox = $('#cbox')
-
         // ? input 
         input_box = $('#inputBox')
 
@@ -119,15 +134,18 @@ window.onload = () => {
         // ? Get image input
         input = $('#imageinput')[0]
 
+        // ? for clear all data before upload new img
         input_z = $('#imageinput')
 
+        // ? img preview div
         output = $('#result');
 
         // ? image preview
         input_z.click(() => {
             // ? set text field value to empty
             output.empty()
-            console.log("clear imagebox")
+            input_box.empty()
+            document.getElementById('sendtoDB').style.display = "none";
         })
 
         // ? if get input
@@ -135,23 +153,20 @@ window.onload = () => {
 
             // ? payload to backend
             let formData = new FormData();
-            fileList = input.files
-            // formData.append('image', input.files);
 
+            // ? get list of input file
             inpFile = document.getElementById('imageinput')
 
-            // console.log(fileList)
-
+            // ? push all input file
             for (const file of inpFile.files) {
                 formData.append("image", file)
             }
 
-            // console.log("end for")
-
-            for (const [key, value] of formData) {
-                // console.log(`key : ${key}`)
-                // console.log(`value : ${value}`)
-            }
+            // * check formdata
+            // for (const [key, value] of formData) {
+            //     // console.log(`key : ${key}`)
+            //     // console.log(`value : ${value}`)
+            // }
 
 
             // ? ajax send to backend
@@ -188,8 +203,14 @@ window.onload = () => {
                     // console.log("upload success");
                     // console.log(data);
 
+                    // ? empty
+                    box_path = []
+                    c_result_arr = []
+
+                    // ? loop all data from payload
                     for (i in data) {
 
+                        // * check
                         // console.log(i)
                         // console.log(data[i])
 
@@ -197,8 +218,56 @@ window.onload = () => {
                         a_msg = data[i]['alert']
                         bytestring = data[i]['status']
                         ocr_txt = data[i]['json_ocr_txt']
-                        box_path = data[i]['box_path']
                         count_result = data[i]['count_result']
+                        box_path.push(data[i]['box_path'])
+
+                        // ? create h element 
+                        h_elm = document.createElement("h3")
+
+                        // ? set header number for image
+                        num = parseInt(i) + 1
+                        h_elm.innerHTML = "Image " + num + " :"
+
+                        // ? append h element to id input_box
+                        input_box.append(h_elm)
+
+                        // ? if get counts result 
+                        if (count_result != undefined) {
+
+                            // ? rearrange text
+                            c_result = count_result.toString().split("\g").join("\n")
+                            c_result = c_result.replace("name", "Results")
+                            c_result = c_result.replace("dtype: int64", "")
+
+                            // ? create p for result each image
+                            p_result = document.createElement("p")
+
+                            // ? set attr
+                            p_result.style = "white-space: pre-wrap;"
+
+                            // ? set text inside p_result elm
+                            p_result.innerHTML = c_result
+
+                            // ? append p element to id input_box
+                            input_box.append(p_result)
+
+                            // ? remove number for input name
+                            c_result = c_result.replace("Results", "")
+                            c_result_remove = c_result.replace(/[0-9]/g, '');
+                            c_result_remove = c_result_remove.replace('\t', '');
+                            c_result_remove = c_result_remove.replace(/\s/, '');
+                            c_result_remove = c_result_remove.replace(/^\s+|\s+$/gm, '');
+
+                            // * check
+                            // console.log(c_result_remove)
+
+                            // ? create new line 
+                            // c_result_arr = c_result_remove.split("\n")
+                            c_result_arr.push(c_result_remove.split("\n"))
+
+                            // * check
+                            // console.log(c_result_arr)
+                        }
 
                         // * check
                         // console.log("a_msg : ", a_msg)
@@ -212,6 +281,12 @@ window.onload = () => {
 
                             // * check
                             // console.log("box_path :", box_path)
+
+                            // ? image preview
+                            imagebox = $('#imagebox' + [i])
+
+                            // ? featherlight img popup
+                            abox = $('#abox' + [i])
 
                             // ? replace image with new image from backend
                             abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
@@ -246,7 +321,7 @@ window.onload = () => {
                                 p_elm = document.createElement("p")
 
                                 // ? set text inside
-                                p_elm.innerHTML = "Car" + count + " :"
+                                p_elm.innerHTML = "Car " + count + " :"
 
                                 // ? append p element to id input_box
                                 input_box.append(p_elm)
@@ -317,33 +392,6 @@ window.onload = () => {
                             }
                         }
 
-                        // ? if get counts result 
-                        if (count_result != undefined) {
-
-                            // ? rearrange text
-                            c_result = count_result.toString().split("\g").join("\n")
-                            c_result = c_result.replace("name", "Results")
-                            c_result = c_result.replace("dtype: int64", "")
-
-                            // ? set text in cbox
-                            cbox.text(c_result)
-
-                            // ? remove number for input name
-                            c_result = c_result.replace("Results", "")
-                            c_result_remove = c_result.replace(/[0-9]/g, '');
-                            c_result_remove = c_result_remove.replace('\t', '');
-                            c_result_remove = c_result_remove.replace(/\s/, '');
-                            c_result_remove = c_result_remove.replace(/^\s+|\s+$/gm, '');
-
-                            // * check
-                            // console.log(c_result_remove)
-
-                            // ? create new line 
-                            c_result_arr = c_result_remove.split("\n")
-
-                            // * check
-                            // console.log(c_result_arr)
-                        }
 
                         // ? if alert msg is not set
                         if (a_msg != undefined) {
@@ -370,40 +418,126 @@ window.onload = () => {
         box_path = box_path
         c_result_arr = c_result_arr
 
+        // * check
+        // console.log("box path =")
+        // console.log(box_path)
+        // console.log("c_ result =")
+        // console.log(c_result_arr)
+
         // ? empty arr for sorting
-        sort_type = []
-        sort_brand = []
-        sort_color = []
+        sort_brand_arr = []
+        sort_type_arr = []
+        sort_color_arr = []
 
         // ? sorting c_result_arr
-        c_result_arr.forEach(e => {
+        for (i in c_result_arr) {
 
-            // ? sorting type
-            type_arr.forEach(type => {
-                if (type == e) {
-                    sort_type.push(e)
-                }
-            });
+            // * check
+            // console.log("=== loop : " + i)
 
-            // ? sorting brand
-            brand_arr.forEach(brand => {
-                if (brand == e) {
-                    sort_brand.push(e)
-                }
+            // ? status for insert null
+            brand_status = false
+            type_status = false
+            color_status = false
+
+            // ? empty obj to store each image 
+            sort_brand_obj = {}
+            sort_type_obj = {}
+            sort_color_obj = {}
+
+            // ? foreach loop
+            c_result_arr[i].forEach(e => {
+
+                // * check
+                // console.log("--- each : " + e)
+
+                // ? sorting brand
+                brand_arr.forEach(brand => {
+                    if (brand == e) {
+
+                        // * check
+                        // console.log("match brand : " + e)
+
+                        // ? pass match variable
+                        sort_brand_obj["brand"] = e
+
+                        // ? set staus not insert null
+                        brand_status = true
+                    }
+                    if (brand_status != true) {
+
+                        // * check
+                        // console.log("brand status != true add null")
+
+                        // ? insert null
+                        sort_brand_obj["brand"] = null
+                    }
+                })
+
+                // ? sorting type
+                type_arr.forEach(type => {
+                    if (type == e) {
+
+                        // * check
+                        // console.log("match type : " + e)
+
+                        // ? pass match variable
+                        sort_type_obj["type"] = e
+
+                        // ? set status not insert null
+                        type_status = true
+                    }
+                    if (type_status != true) {
+
+                        // * check
+                        // console.log("type status != true add null")
+
+                        // ? insert null
+                        sort_type_obj["type"] = null
+                    }
+                });
+
+                // ? sorting color
+                color_arr.forEach(color => {
+                    if (color == e) {
+
+                        // * check
+                        // console.log("match color : " + e)
+
+                        // ? pass sorting variable
+                        sort_color_obj["color"] = e
+
+                        // ? set status not insert null
+                        color_status = true
+                    }
+                    if (color_status != true) {
+
+                        // * check
+                        // console.log("color status != true add null")
+
+                        // ? insert null
+                        sort_color_obj["color"] = null
+                    }
+                });
+
+                // * check
+                // console.log(sort_type_arr)
+                // console.log(sort_brand_arr)
+                // console.log(sort_color_arr)
             })
 
-            // ? sorting color
-            color_arr.forEach(color => {
-                if (color == e) {
-                    sort_color.push(e)
-                }
-            });
-        })
+            // ? push obj to arr
+            sort_brand_arr.push(sort_brand_obj)
+            sort_type_arr.push(sort_type_obj)
+            sort_color_arr.push(sort_color_obj)
 
-        // ? from sorting create new line
-        type = sort_type.toString().split(",").join("\n")
-        brand = sort_brand.toString().split(",").join("\n")
-        color = sort_color.toString().split(",").join("\n")
+
+        }
+
+        // * check
+        // console.log(sort_type_arr)
+        // console.log(sort_brand_arr)
+        // console.log(sort_color_arr)
 
         // ? get all input field in #input-form
         var input_form = document.querySelectorAll("#input-form input[type=text]")
@@ -429,43 +563,75 @@ window.onload = () => {
 
         // * check
         // console.log(input_obj)
+        // console.log(box_path)
 
         // ? empty arr
         arr = [];
 
-        // ? form input_obj create new data_arr
+        // ? loop create obj data
+        j = 0
         for (var i = 0; i < input_obj.length; i += 2) {
+
+            // ? some of field increment is not match
+            // ? use j instead of i
+            if (i > j) {
+                j = j + 1
+            }
+
+            // * check
+            // console.log("i = " + i)
+            // console.log("j = " + j)
+
+            // ? create empty obj in loop
             var obj = {};
+
             obj['plate'] = input_obj[i];
             obj['province'] = input_obj[i + 1];
+
+            obj['image'] = box_path[j]
+
+            // * check
+            console.log(sort_brand_arr[i])
+
+            // ? if get null set to "-"
+            if (sort_brand_arr[j] != null) {
+                brand = sort_brand_arr[j]['brand']
+            } else {
+                brand = "-"
+            }
             obj['brand'] = brand
+
+            // ? if get null set to "-"
+            console.log(sort_type_arr[i])
+            if (sort_type_arr[j] != null) {
+                type = sort_type_arr[j]['type']
+            } else {
+                type = "-"
+            }
             obj['type'] = type
+
+            // ? if get null set to "-"
+            console.log(sort_color_arr[i])
+            if (sort_color_arr[j] != null) {
+                color = sort_color_arr[j]['color']
+            } else {
+                color = "-"
+            }
             obj['color'] = color
-            obj['image'] = box_path
+
+            // ? push obj in arr
             arr.push(obj);
         }
 
         // * check
-        console.log(arr);
+        // console.log(arr);
 
         // ? store arr in data 
         data = arr
 
-        // data = []
-        // for (i in arr) {
-        //     data.push(i, arr[i])
-        // }
-
         // * check
-        console.log(data);
-        // data = {
-        //     'plate': plateBox,
-        //     'province': provinceBox,
-        //     'brand': brand,
-        //     'type': type,
-        //     'color': color,
-        //     'image': box_path
-        // }
+        // console.log("JSON.stringify(data)")
+        // console.log(JSON.stringify(data))
 
         $.ajax({
             url: "/sendtoDB",
@@ -496,8 +662,9 @@ window.onload = () => {
             },
             success: function (response) {
 
-                console.log("upload success");
-                console.log(response);
+                // * check
+                // console.log("upload success");
+                // console.log(response);
 
                 // ? alert msg
                 Swal.fire({
@@ -514,34 +681,3 @@ window.onload = () => {
         })
     })
 };
-
-function readUrl(input) {
-
-    // ? html elment
-    imagebox = $('#imagebox')
-    abox = $('#abox')
-
-    // * check
-    // console.log("evoked readUrl")
-
-    // ? if get image input
-    if (input.files && input.files[0]) {
-
-        // ? read file
-        let reader = new FileReader();
-        reader.onload = function (e) {
-
-            // * log event
-            // console.log(e)
-
-            // ? image preview
-            imagebox.attr('src', e.target.result);
-            abox.attr('href', e.target.result)
-            // imagebox.height(500);
-            // imagebox.width(800);
-        }
-        reader.readAsDataURL(input.files[0]);
-    }
-
-
-}
