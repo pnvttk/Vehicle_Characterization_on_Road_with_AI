@@ -561,7 +561,7 @@ def chart():
     str_to_list1 = (Convert(re_str4)) 
     list_type = [item.strip("'") for item in str_to_list1]
 
-     ## ----------------------------------------------------------------
+    ## ----------------------------------------------------------------
 
     ## convert a tuple to string
     tuple_to_str2 = convertTuple(count_color_data) 
