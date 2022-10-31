@@ -1,5 +1,9 @@
 import base64
+from cProfile import label
+from calendar import c
 from cmath import log
+from curses import echo
+from optparse import Values
 from urllib import response
 import cv2
 import numpy as np
@@ -15,6 +19,11 @@ import pathlib
 import re
 import json
 import time
+import requests
+import functools
+import operator
+import ast
+from ast import literal_eval
 from asyncio.windows_events import NULL
 from distutils.command.upload import upload
 from itertools import count
@@ -65,7 +74,7 @@ model = torch.hub.load('./yolov5', 'custom', source='local',
 # ? all classname
 classes = model.names  # class names in string format
 # ? confidence threshold
-model.conf = 0.5
+model.conf = 0.45
 
 
 # ? Unique name generate
@@ -373,7 +382,7 @@ def sendtoDB():
         # time = now.strftime("%H:%M:%S")
         # # print("time:", time)
 
-        date_time = now.strftime("%m/%d/%Y, %H:%M")
+        date_time = now.strftime("%m/%d/%Y,%H:%m")
         # print("date and time:", date_time)
 
         upload_date = date_time
@@ -439,9 +448,10 @@ def table():
     type_data = [item[0] for item in cur.fetchall()]
     cur.execute('SELECT color_name FROM `color`;')
     color_data = [item[0] for item in cur.fetchall()]
+    
 
     # * check log
-    # print(plate_data)
+    #print(plate_data)
     # print(province_data)
     # print(brand_data)
     # print(type_data)
@@ -461,12 +471,29 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
 
+def convertTuple(tup):
+    st = ''.join(map(str, tup))
+    return st
 
-    
+def Convert(string):
+    li = list(string.split(" "))
+    return li
 
-@ app.route("/chart")
+# # Chart
+@ app.route("/chart", methods=['GET', 'POST'])
 def chart ():
-    return render_template('chart.html')
+
+    cur = conn.cursor()
+    cur.execute('SELECT brand_name FROM `brand`;') ## get brand for chart
+    brand_data = [item[0] for item in cur.fetchall()] ## get brand for chart
+    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;') ## COUNT brand for chart
+    tb_detect_data1 = [cur.fetchall()] ## COUNT brand for chart
+    tuple_to_str = convertTuple(tb_detect_data1) ## convert a tuple to string
+    re_str = re.compile('[,()]')  ## ลบ , ()
+    re_str2 = re_str.sub('', str(tuple_to_str)) 
+    str_to_list = (Convert(re_str2)) ## convert a string to list
+    new_list = [item.strip("'") for item in str_to_list] ## ลบ ' 
+    return render_template('chart.html', brand_data=brand_data,new_list=new_list)
 
 # ? server and port setup
 if __name__ == "__main__":
