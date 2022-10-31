@@ -48,6 +48,8 @@ window.onload = () => {
         // ? get file input 
         var filesInput = document.getElementById("imageinput");
 
+        if(filesInput){
+
         filesInput.addEventListener("change", function (event) {
 
             // ? FileList object
@@ -117,6 +119,7 @@ window.onload = () => {
             }
 
         });
+    }
     }
     else {
         console.log("Your browser does not support File API");
@@ -591,7 +594,7 @@ window.onload = () => {
             obj['image'] = box_path[j]
 
             // * check
-            console.log(sort_brand_arr[i])
+            // console.log(sort_brand_arr[i])
 
             // ? if get null set to "-"
             if (sort_brand_arr[j] != null) {
@@ -602,7 +605,7 @@ window.onload = () => {
             obj['brand'] = brand
 
             // ? if get null set to "-"
-            console.log(sort_type_arr[i])
+            // console.log(sort_type_arr[i])
             if (sort_type_arr[j] != null) {
                 type = sort_type_arr[j]['type']
             } else {
@@ -611,7 +614,7 @@ window.onload = () => {
             obj['type'] = type
 
             // ? if get null set to "-"
-            console.log(sort_color_arr[i])
+            // console.log(sort_color_arr[i])
             if (sort_color_arr[j] != null) {
                 color = sort_color_arr[j]['color']
             } else {
@@ -624,7 +627,7 @@ window.onload = () => {
         }
 
         // * check
-        // console.log(arr);
+        console.log(arr);
 
         // ? store arr in data 
         data = arr
