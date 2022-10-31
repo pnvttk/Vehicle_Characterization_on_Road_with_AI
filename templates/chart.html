@@ -1,61 +1,66 @@
 {% extends "base.html" %}
-
 {% block content %}
+<div class="text-center mt-3">
+    <button class="btn btn-primary" onclick="functionG1()" id="g1">Hide Brand Chart </button>
+    <button class="btn btn-danger"  onclick="functionG2()" id="g2">Hide Type Chart</button>
+    <button class="btn btn-warning" onclick="functionG3()" id="g3">Hide Color Chart</button>
+</div>
+
 <div class="container">
     <p align="center">
-        <canvas id="myChart" style="position: relative; height: 800; width: 500;"></canvas>
+        <canvas id="Brand" width="800px" height="350px" class="mt-3"></canvas>
         <script>
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
+            var ctx = document.getElementById('Brand').getContext('2d');
+            var Brand = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: {{ brand_data | safe }},
+                labels: {{ brand_data | safe }},
             datasets: [{
                 label: "จำนวนที่จัดเก็บในฐานข้อมูล",
-                data: {{ new_list | safe}},
+                data: {{ list_brand | safe}},
                 backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                'rgba(255, 99, 132, 1)', // toyota
+                'rgba(54, 162, 235, 1)', // honda
+                'rgba(255, 206, 86, 1)', // Isuzu
+                'rgba(75, 192, 192, 1)', // mitsu
+                'rgba(153, 102, 255, 1)', // ford
+                'rgba(255, 159, 64, 1)', // nissan
+                'rgba(255,0,0, 1)', // mazda
+                'rgba(0,255,0, 1)', // suzuki
+                'rgba(86, 115, 192, 1)', // MG
+                'rgba(196, 115, 192, 1)', // Chevrolet
+                'rgba(169, 86, 72, 1)', // volvo
+                'rgba(194, 0, 255, 1)', // Mercedes-Benz
+                'rgba(115, 0, 255, 1)', // BMW
+                'rgba((242, 0, 255, 1)', // Foton
+                'rgba(255, 206, 86, 1)', // tata
+                'rgba(255, 255, 23, 1)', // lexus
+                'rgba(255, 178, 142, 1)', // hyundai
+                'rgba(111, 178, 142, 1)', // Hino
+                'rgba(196, 255, 0, 1)', // Volkswagen
+                'rgba(196, 45, 0, 1)' // Subaru
             ],
                 borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                'rgba(255, 99, 132, 1)', // toyota
+                'rgba(54, 162, 235, 1)', // honda
+                'rgba(255, 206, 86, 1)', // Isuzu
+                'rgba(75, 192, 192, 1)', // mitsu
+                'rgba(153, 102, 255, 1)', // ford
+                'rgba(255, 159, 64, 1)', // nissan
+                'rgba(255,0,0, 1)', // mazda
+                'rgba(0,255,0, 1)', // suzuki
+                'rgba(86, 115, 192, 1)', // MG
+                'rgba(196, 115, 192, 1)', // Chevrolet
+                'rgba(169, 86, 72, 1)', // volvo
+                'rgba(194, 0, 255, 1)', // Mercedes-Benz
+                'rgba(115, 0, 255, 1)', // BMW
+                'rgba((242, 0, 255, 1)', // Foton
+                'rgba(255, 206, 86, 1)', // tata
+                'rgba(255, 255, 23, 1)', // lexus
+                'rgba(255, 178, 142, 1)', // hyundai
+                'rgba(111, 178, 142, 1)', // Hino
+                'rgba(196, 255, 0, 1)', // Volkswagen
+                'rgba(196, 45, 0, 1)' // Subaru
             ],
                 borderWidth: 2,
         }]
@@ -70,6 +75,126 @@
                 }
             }
 });
-        </script>
+
+function functionG1() {
+      var x = document.getElementById("Brand");
+      if (x.style.display === "none") {
+        document.getElementById("g1").innerHTML = "Hide Brand Chart"; 
+        x.style.display = "block";
+      } else {
+        document.getElementById("g1").innerHTML = "Show Brand Chart"; 
+        x.style.display = "none";
+      }
+    }
+    </script>
+
+    <canvas id="type" width="800px" height="350px" class="mt-3"></canvas>
+    <script>
+        var ctx = document.getElementById('type').getContext('2d');
+        var type = new Chart(ctx, {
+            type: 'pie',
+            data: {
+            labels: {{ type_data | safe }},
+        datasets: [{
+            label: "จำนวนที่จัดเก็บในฐานข้อมูล",
+            data: {{ list_type | safe}},
+            backgroundColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(155, 152, 50, 1)',
+            'rgba(255, 159, 64, 1)'
+        ],
+            borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(155, 152, 50, 1)',
+            'rgba(255, 159, 64, 1)'
+        ],
+        hoverOffset: 7
+    }]
+},
+        options: {}
+});
+
+function functionG2() {
+      var x = document.getElementById("type");
+      if (x.style.display === "none") {
+        document.getElementById("g2").innerHTML = "Hide Type Chart"; 
+        x.style.display = "block";
+      } else {
+        document.getElementById("g2").innerHTML = "Show Type Chart"; 
+        x.style.display = "none";
+      }
+    }
+</script>
+
+    </script>
+    <canvas id="color" width="800px" height="350px" class="mt-3"></canvas>
+    <script>
+        var ctx = document.getElementById('color').getContext('2d');
+        var color = new Chart(ctx, {
+            type: 'bar',
+            data: {
+            labels: {{ color_data | safe }},
+        datasets: [{
+            label: "จำนวนที่จัดเก็บในฐานข้อมูล",
+            data: {{ list_color | safe}},
+            backgroundColor: [
+            'rgba(0, 0, 0, 1)',
+            'rgba(255, 255, 255, 1)',
+            'rgba(192, 192, 192, 1)',
+            'rgba(128,128,128, 1)',
+            'rgba(255,0,0, 1)',
+            'rgba(0,0,255, 1)',
+            'rgba(255,255,0, 1)',
+            'rgba(255,165,0, 1)',
+            'rgba(0,255,0, 1)',
+            'rgba(255,215,0, 1)',
+            'rgba(150,75,0, 1)'
+        ],
+            borderColor: [
+            'rgba(0, 0, 0, 1)',
+            'rgba(0, 0, 0, 1)',
+            'rgba(0, 0, 0, 1)',
+            'rgba(0, 0, 0, 1)',
+            'rgba(255,0,0, 1)',
+            'rgba(0,0,255, 1)',
+            'rgba(255,255,0, 1)',
+            'rgba(255,165,0, 1)',
+            'rgba(0,255,0, 1)',
+            'rgba(255,215,0, 1)',
+            'rgba(150,75,0, 1)'
+        ],
+            borderWidth: 2,
+    }]
+},
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+});
+
+function functionG3() {
+      var x = document.getElementById("color");
+      if (x.style.display === "none") {
+        document.getElementById("g3").innerHTML = "Hide Color Chart"; 
+        x.style.display = "block";
+      } else {
+        document.getElementById("g3").innerHTML = "Show Color Chart"; 
+        x.style.display = "none";
+      }
+    }
+</script>
 </div>
 {% endblock%}

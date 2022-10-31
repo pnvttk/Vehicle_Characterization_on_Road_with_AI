@@ -519,26 +519,62 @@ def Convert(string):
 def chart():
 
     cur = conn.cursor()
-    cur.execute('SELECT brand_name FROM `brand`;')  # get brand for chart
-    brand_data = [item[0] for item in cur.fetchall()]  # get brand for chart
+    cur.execute('SELECT brand_name FROM `brand`;') ## get brand for chart
+    brand_data = [item[0] for item in cur.fetchall()] ## get brand for chart
 
-    # COUNT brand for chart
-    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;')
-    tb_detect_data1 = [cur.fetchall()]  # COUNT brand for chart
+    cur.execute('SELECT type_name FROM `type`;') 
+    type_data = [item[0] for item in cur.fetchall()]
+
+    cur.execute('SELECT color_name FROM `color`;') 
+    color_data = [item[0] for item in cur.fetchall()] 
+    
+    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;') ## COUNT brand for chart
+    count_brand_data = [cur.fetchall()] ## COUNT brand for chart
+
+    cur.execute('SELECT COUNT(detect_data.type) FROM type LEFT JOIN detect_data on type.type_name = detect_data.type GROUP BY type.type_name ORDER BY type_id;') ## COUNT brand for chart
+    count_type_data = [cur.fetchall()]
+
+    cur.execute('SELECT COUNT(detect_data.color) FROM color LEFT JOIN detect_data on color.color_name = detect_data.color GROUP BY color.color_name ORDER BY color_id;') ## COUNT brand for chart
+    count_color_data = [cur.fetchall()] 
+
+    ## convert a tuple to string
+    tuple_to_str = convertTuple(count_brand_data) 
 
     # convert a tuple to string
     tuple_to_str = convertTuple(tb_detect_data1)
 
-    # ลบ , ()
-    re_str = re.compile('[,()]')
-    re_str2 = re_str.sub('', str(tuple_to_str))
+    ## convert a string to list
+    str_to_list = (Convert(re_str2)) 
+    list_brand = [item.strip("'") for item in str_to_list] ## ลบ ' 
 
-    # convert a string to list
-    str_to_list = (Convert(re_str2))
-    new_list = [item.strip("'") for item in str_to_list]  # ลบ '
+    ## ----------------------------------------------------------------
 
-    return render_template('chart.html', brand_data=brand_data, new_list=new_list)
+    ## convert a tuple to string
+    tuple_to_str1 = convertTuple(count_type_data) 
 
+    ## ลบ , ()
+    re_str3 = re.compile('[,()]')  
+    re_str4 = re_str3.sub('', str(tuple_to_str1)) 
+
+    ## convert a string to list
+    str_to_list1 = (Convert(re_str4)) 
+    list_type = [item.strip("'") for item in str_to_list1]
+
+     ## ----------------------------------------------------------------
+
+    ## convert a tuple to string
+    tuple_to_str2 = convertTuple(count_color_data) 
+
+    ## ลบ , ()
+    re_str5 = re.compile('[,()]')  
+    re_str6 = re_str5.sub('', str(tuple_to_str2)) 
+
+    ## convert a string to list
+    str_to_list2 = (Convert(re_str6)) 
+    list_color = [item.strip("'") for item in str_to_list2]
+
+
+    return render_template('chart.html', brand_data=brand_data,type_data=type_data,color_data=color_data,list_brand=list_brand,list_type=list_type,list_color=list_color)
 
 # ? server and port setup
 if __name__ == "__main__":
