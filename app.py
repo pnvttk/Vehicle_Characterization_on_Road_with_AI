@@ -37,7 +37,7 @@ from color_arr import color_arr
 from thefuzz import fuzz, process
 from pathlib import Path
 # from flask import Flask
-from flask_ngrok import run_with_ngrok
+# from flask_ngrok import run_with_ngrok
 # from eOCR import main
 
 # ? Setup Flask
