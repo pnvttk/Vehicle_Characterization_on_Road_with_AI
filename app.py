@@ -366,9 +366,6 @@ def sendtoDB():
 
         print("[INFO] GET DATA FROM FRONTEND")
         print("|")
-        # print(type(data))
-        # print(data)
-        # quit()
 
         # ? Loop through json
         for data in data_json:
@@ -389,13 +386,8 @@ def sendtoDB():
             plate.replace(' ', '\n')
             province.replace(' ', '\n')
 
-            # print(data['image'])
+            # ? random hex for img name
             random_p = uuid.uuid4().hex
-
-            # ! old method move image can't use with array of data
-            # print(Path(data['image']).rename(
-            #     "./static/upload/" + random_p + ".jpg"))
-            # image_uploda = random_p + ".jpg"
 
             # ? copy ./result/image to ./static/upload
             original = data['img']
@@ -465,7 +457,7 @@ def sendtoDB():
                 print('Failed to delete %s. Reason: %s' %
                       (file_path, e))
 
-    return jsonify({'status': 'success'})
+        return jsonify({'status': 'success'})
     # return ('', 204)
 
 
