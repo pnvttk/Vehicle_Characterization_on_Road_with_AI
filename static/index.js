@@ -269,18 +269,18 @@ window.onload = () => {
                             // console.log(c_result_arr)
                         }
 
-                        // * check
-                        // console.log("a_msg : ", a_msg)
-                        // console.log("bytestring : ", bytestring)
-                        // console.log("ocr_txt : ", ocr_txt)
+                    // * check
+                    // console.log("a_msg : ", a_msg)
+                    // console.log("bytestring : ", bytestring)
+                    // console.log("ocr_txt : ", ocr_txt)
                         // console.log(typeof ocr_txt)
-                        // console.log("count_result : ", count_result)
+                    // console.log("count_result : ", count_result)
 
-                        // ? if get image
-                        if (bytestring != undefined) {
+                    // ? if get image
+                    if (bytestring != undefined) {
 
-                            // * check
-                            // console.log("box_path :", box_path)
+                        // * check
+                        // console.log("box_path :", box_path)
 
                             // ? image preview
                             imagebox = $('#imagebox' + [i])
@@ -288,25 +288,25 @@ window.onload = () => {
                             // ? featherlight img popup
                             abox = $('#abox' + [i])
 
-                            // ? replace image with new image from backend
-                            abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
-                            imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
+                        // ? replace image with new image from backend
+                        abox.attr('href', 'data:image/jpeg;base64,' + bytestring)
+                        imagebox.attr('src', 'data:image/jpeg;base64,' + bytestring)
 
-                            // ? alert msg
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Successfully',
-                                text: 'Obejct Detection have been compleate!',
-                            })
-                        }
+                        // ? alert msg
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Successfully',
+                            text: 'Obejct Detection have been compleate!',
+                        })
+                    }
 
-                        // ? if get ocr text
-                        if (ocr_txt != undefined) {
+                    // ? if get ocr text
+                    if (ocr_txt != undefined) {
 
                             // ? show upload to db button
                             document.getElementById('sendtoDB').style.display = "block";
 
-                            // ? empty array 
+                        // ? empty array 
                             plate_arr = ""
                             province_arr = ""
 
@@ -334,7 +334,7 @@ window.onload = () => {
 
                                     if (key == "plate") {
                                         input_val = ocr_txt[i][key]
-                                    }
+                                }
 
                                     if (key == "province") {
 
@@ -343,15 +343,15 @@ window.onload = () => {
 
                                             input_val = "-"
 
-                                            Swal.fire({
-                                                icon: 'warning',
-                                                title: "Detect successfully.",
+                            Swal.fire({
+                                icon: 'warning',
+                                title: "Detect successfully.",
                                                 text: "But can't detect some text, Double check before process.",
-                                            })
-                                        } else {
+                            })
+                        } else {
                                             input_val = ocr_txt[i][key]
-                                        }
-                                    }
+                        }
+                    }
 
                                     // ? create div elemnt for input field
                                     div_elm = document.createElement("div")
@@ -386,27 +386,27 @@ window.onload = () => {
 
                                     // ? append to div element
                                     div_elm.append(label_elm)
-                                }
+                    }
                                 // ? increment count for car number
                                 count += 1
                             }
                         }
 
 
-                        // ? if alert msg is not set
-                        if (a_msg != undefined) {
+                    // ? if alert msg is not set
+                    if (a_msg != undefined) {
 
-                            // ? alert err msg
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: "Object Detection have been failed! \n Look like there isn't car in this image",
-                            }).then(function () {
-                                location.reload();
-                            }
-                            );
+                        // ? alert err msg
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: "Object Detection have been failed! \n Look like there isn't car in this image",
+                        }).then(function () {
+                            location.reload();
                         }
+                        );
                     }
+                }
                 }
             });
         }
@@ -475,8 +475,8 @@ window.onload = () => {
                 })
 
                 // ? sorting type
-                type_arr.forEach(type => {
-                    if (type == e) {
+            type_arr.forEach(type => {
+                if (type == e) {
 
                         // * check
                         // console.log("match type : " + e)
@@ -494,12 +494,12 @@ window.onload = () => {
 
                         // ? insert null
                         sort_type_obj["type"] = null
-                    }
-                });
+                }
+            });
 
                 // ? sorting color
-                color_arr.forEach(color => {
-                    if (color == e) {
+            color_arr.forEach(color => {
+                if (color == e) {
 
                         // * check
                         // console.log("match color : " + e)
@@ -517,14 +517,14 @@ window.onload = () => {
 
                         // ? insert null
                         sort_color_obj["color"] = null
-                    }
-                });
+                }
+            });
 
                 // * check
                 // console.log(sort_type_arr)
                 // console.log(sort_brand_arr)
                 // console.log(sort_color_arr)
-            })
+        })
 
             // ? push obj to arr
             sort_brand_arr.push(sort_brand_obj)

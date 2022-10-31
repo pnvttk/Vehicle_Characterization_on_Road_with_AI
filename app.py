@@ -410,40 +410,40 @@ def sendtoDB():
             if color == "":
                 color = None
 
-        date_time = now.strftime("%m/%d/%Y,%H:%m")
+        now = datetime.now()
         # print("date and time:", date_time)
 
-            # * check log
-            # year = now.strftime("%Y")
-            # # print("year:", year)
-            # month = now.strftime("%m")
-            # # print("month:", month)
-            # day = now.strftime("%d")
-            # # print("day:", day)
-            # time = now.strftime("%H:%M:%S")
-            # # print("time:", time)
+        # * check log
+        # year = now.strftime("%Y")
+        # # print("year:", year)
+        # month = now.strftime("%m")
+        # # print("month:", month)
+        # day = now.strftime("%d")
+        # # print("day:", day)
+        # time = now.strftime("%H:%M:%S")
+        # # print("time:", time)
 
-            # ? set format
-            date_time = now.strftime("%m/%d/%Y, %H:%M")
-            # print("date and time:", date_time)
-            # ? pass to variable
-            upload_date = date_time
+        # ? set format
+        date_time = now.strftime("%m/%d/%Y, %H:%M")
+        # print("date and time:", date_time)
+        # ? pass to variable
+        upload_date = date_time
 
-            # ? try catch when commit to database
-            try:
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                               (plate, province, brand, car_type, color, upload_date, image_uploda))
-                conn.commit()
-                print("=======")
-                print("success")
-                print("=======")
-                commit_status = True
+        # ? try catch when commit to database
+        try:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                            (plate, province, brand, car_type, color, upload_date, image_uploda))
+            conn.commit()
+            print("=======")
+            print("success")
+            print("=======")
+            commit_status = True
 
-            except pymysql.IntegrityError:
-                print("=======")
-                print("failed")
-                print("=======")
+        except pymysql.IntegrityError:
+            print("=======")
+            print("failed")
+            print("=======")
 
         # ? delete all folder in ./results
         if commit_status == True:
