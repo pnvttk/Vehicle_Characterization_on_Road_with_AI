@@ -373,6 +373,12 @@ def sendtoDB():
         # ? Loop through json
         for data in data_json:
 
+            #     print(data)
+
+            # quit()
+
+            # for data in data_json:
+
             # ? convert json to object
             plate = data['plate']
             province = data['province']
@@ -383,7 +389,7 @@ def sendtoDB():
             plate.replace(' ', '\n')
             province.replace(' ', '\n')
 
-            print(data['image'])
+            # print(data['image'])
             random_p = uuid.uuid4().hex
 
             # ! old method move image can't use with array of data
@@ -392,7 +398,7 @@ def sendtoDB():
             # image_uploda = random_p + ".jpg"
 
             # ? copy ./result/image to ./static/upload
-            original = data['image']
+            original = data['img']
             target = "./static/upload/" + random_p + ".jpg"
             image_uploda = target
             shutil.copyfile(original, target)
@@ -437,28 +443,30 @@ def sendtoDB():
                 print("=======")
                 print("success")
                 print("=======")
-                commit_status = True
 
             except pymysql.IntegrityError:
                 print("=======")
                 print("failed")
                 print("=======")
 
-        # ? delete all folder in ./results
-        if commit_status == True:
-            for filename in os.listdir(results_folder):
-                file_path = os.path.join(results_folder, filename)
-                try:
-                    if os.path.isfile(file_path) or os.path.islink(file_path):
-                        os.unlink(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print('Failed to delete %s. Reason: %s' %
-                          (file_path, e))
+    commit_status = True
 
-        return jsonify({'status': 'success'})
-    return ('', 204)
+    # ? delete all folder in ./results
+    if commit_status == True:
+        for filename in os.listdir(results_folder):
+            file_path = os.path.join(results_folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                print("888 DELETE SUCCESS 888")
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' %
+                      (file_path, e))
+
+    return jsonify({'status': 'success'})
+    # return ('', 204)
 
 
 # ? Root path
