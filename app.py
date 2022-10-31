@@ -370,11 +370,7 @@ def sendtoDB():
         # ? Loop through json
         for data in data_json:
 
-            #     print(data)
-
-            # quit()
-
-            # for data in data_json:
+            # print(data)
 
             # ? convert json to object
             plate = data['plate']
@@ -409,16 +405,6 @@ def sendtoDB():
 
             now = datetime.now()
             # print("date and time:", date_time)
-
-            # * check log
-            # year = now.strftime("%Y")
-            # # print("year:", year)
-            # month = now.strftime("%m")
-            # # print("month:", month)
-            # day = now.strftime("%d")
-            # # print("day:", day)
-            # time = now.strftime("%H:%M:%S")
-            # # print("time:", time)
 
             # ? set format
             date_time = now.strftime("%m/%d/%Y, %H:%M")
@@ -543,7 +529,7 @@ def chart():
     # convert a tuple to string
     tuple_to_str = convertTuple(tb_detect_data1)
 
-    ## ลบ , ()
+    # ลบ , ()
     re_str = re.compile('[,()]')
     re_str2 = re_str.sub('', str(tuple_to_str))
 

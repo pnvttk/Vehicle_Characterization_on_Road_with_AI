@@ -40,6 +40,7 @@ color_arr = ["Black",
     "Gold",
     "Brown",]
 
+// ? num for compare data between detect and uptodb
 var num
 
 window.onload = () => {
@@ -239,7 +240,6 @@ window.onload = () => {
                         // ? append h element to id input_box
                         input_box.append(h_elm)
 
-
                         // ? create div elemnt for input field
                         div_car_img = document.createElement("div")
 
@@ -376,7 +376,7 @@ window.onload = () => {
                                     div_elm = document.createElement("div")
 
                                     // ? class bootstap floating text
-                                    div_elm.setAttribute("Class", "form-floating");
+                                    div_elm.setAttribute("class", "form-floating");
 
                                     // ? appaend to input_box
                                     div_car_img.append(div_elm)
@@ -409,39 +409,36 @@ window.onload = () => {
                                 }
                                 // ? increment count for car number
                                 count += 1
-                                //? hidden image path 
+
+                                // ? hidden input image path 
                                 input_hiden = document.createElement('input')
+
                                 // ? set attr
                                 input_hiden.type = "hidden";
-                                // input_hiden.name = key + j;
                                 input_hiden.id = "image" + i;
-                                // input_hiden.id = "floatingInput"
                                 input_hiden.value = data[i]['box_path']
-                                // console.log("box path : " + data[i]['box_path'])
-
-                                // input_hiden.className = "form-control mt-3 mb-3"
 
                                 // ? append to div element
                                 div_car_img.append(input_hiden)
 
+                                // * check
+                                // console.log("box path : " + data[i]['box_path'])
                                 // console.log("box path : " + data[i]['box_path'])
 
 
-                                //? hidden c_result path 
+                                //? hidden input c_result path 
                                 c_result_hidden_input = document.createElement('input')
+
                                 // ? set attr
                                 c_result_hidden_input.type = "hidden";
-                                // c_result_hidden_input.name = key + j;
                                 c_result_hidden_input.id = "result" + i;
-                                // c_result_hidden_input.id = "floatingInput"
                                 c_result_hidden_input.value = c_result_arr[i]
-                                // console.log("c_result_hiden : " + c_result_arr + " " + i)
-
-                                // c_result_hidden_input.className = "form-control mt-3 mb-3"
 
                                 // ? append to div element
                                 div_car_img.append(c_result_hidden_input)
 
+                                // * check
+                                // console.log("c_result_hiden : " + c_result_arr + " " + i)
                                 // console.log("box path : " + data[i]['box_path'])
 
                             }
@@ -469,144 +466,14 @@ window.onload = () => {
 
     $('#sendtoDB').click(() => {
 
-        // ? get value
-        box_path = box_path
-        c_result_arr = c_result_arr
-
-        // * check
-        // console.log("box path =")
-        // console.log(box_path)
-        // console.log("c_ result =")
-        // console.log(c_result_arr)
-
-        // // ? empty arr for sorting
-        // sort_brand_arr = []
-        // sort_type_arr = []
-        // sort_color_arr = []
-
-        // // ? sorting c_result_arr
-        // for (i in c_result_arr) {
-
-        //     // * check
-        //     // console.log("=== loop : " + i)
-
-        //     // ? status for insert null
-        //     brand_status = false
-        //     type_status = false
-        //     color_status = false
-
-        //     // ? empty obj to store each image 
-        //     sort_brand_obj = {}
-        //     sort_type_obj = {}
-        //     sort_color_obj = {}
-
-        //     // ? foreach loop
-        //     c_result_arr[i].forEach(e => {
-
-        //         // * check
-        //         // console.log("--- each : " + e)
-
-        //         // ? sorting brand
-        //         brand_arr.forEach(brand => {
-        //             if (brand == e) {
-
-        //                 // * check
-        //                 // console.log("match brand : " + e)
-
-        //                 // ? pass match variable
-        //                 sort_brand_obj["brand"] = e
-
-        //                 // ? set staus not insert null
-        //                 brand_status = true
-        //             }
-        //             if (brand_status != true) {
-
-        //                 // * check
-        //                 // console.log("brand status != true add null")
-
-        //                 // ? insert null
-        //                 sort_brand_obj["brand"] = null
-        //             }
-        //         })
-
-        //         // ? sorting type
-        //         type_arr.forEach(type => {
-        //             if (type == e) {
-
-        //                 // * check
-        //                 // console.log("match type : " + e)
-
-        //                 // ? pass match variable
-        //                 sort_type_obj["type"] = e
-
-        //                 // ? set status not insert null
-        //                 type_status = true
-        //             }
-        //             if (type_status != true) {
-
-        //                 // * check
-        //                 // console.log("type status != true add null")
-
-        //                 // ? insert null
-        //                 sort_type_obj["type"] = null
-        //             }
-        //         });
-
-        //         // ? sorting color
-        //         color_arr.forEach(color => {
-        //             if (color == e) {
-
-        //                 // * check
-        //                 // console.log("match color : " + e)
-
-        //                 // ? pass sorting variable
-        //                 sort_color_obj["color"] = e
-
-        //                 // ? set status not insert null
-        //                 color_status = true
-        //             }
-        //             if (color_status != true) {
-
-        //                 // * check
-        //                 // console.log("color status != true add null")
-
-        //                 // ? insert null
-        //                 sort_color_obj["color"] = null
-        //             }
-        //         });
-
-        //         // * check
-        //         // console.log(sort_type_arr)
-        //         // console.log(sort_brand_arr)
-        //         // console.log(sort_color_arr)
-        //     })
-
-        //     // ? push obj to arr
-        //     sort_brand_arr.push(sort_brand_obj)
-        //     sort_type_arr.push(sort_type_obj)
-        //     sort_color_arr.push(sort_color_obj)
-
-
-        // }
-
-        // // * check
-        // // console.log(sort_type_arr)
-        // // console.log(sort_brand_arr)
-        // // console.log(sort_color_arr)
-
-        // ? get all input field in #input-form
-        // var input_form = document.querySelectorAll("#input-form input[type=text]")
-
-        // ! new method
-        // console.log(num)
-        // num -= i
-
+        // ? empty arr and null temp
         input_arr = []
         temp_plate = null
         temp_province = null
         temp_img = null
         temp_result = null
         for (let i = 0; i < num; i++) {
+
             // * console.log("check")
             // console.log("-------------------------------------------------------")
             // console.log(div_car_img)/
@@ -648,7 +515,18 @@ window.onload = () => {
                             temp_plate = input_form[j]['value']
 
                             // ? add if not null 
-                            if (temp_plate != null || temp_plate != undefined) {
+                            if (temp_plate) {
+
+                                // * check
+                                // console.log("push =>" + temp_plate + "<=")
+
+                                input_obj['plate'] = temp_plate
+                            } else {
+
+                                // * check
+                                // console.log("TEMP PLATE IS NULL")
+
+                                temp_plate = "NULL"
                                 input_obj['plate'] = temp_plate
                             }
                             break
@@ -661,9 +539,21 @@ window.onload = () => {
                             temp_province = input_form[j]['value']
 
                             // ? add if not null
-                            if (temp_province != null || temp_province != undefined) {
+                            if (temp_province) {
+
+                                // * check
+                                // console.log("push =>" + temp_plate + "<=")
+
                                 input_obj['province'] = temp_province
-                                input_obj['plate'] = temp_plate
+                                // input_obj['plate'] = temp_plate
+                            } else {
+
+                                // * check
+                                // console.log("TEMP PROVINCE IS NULL")
+
+                                temp_province = "NULL"
+                                input_obj['province'] = temp_province
+
                             }
                             break
                         case 2:
@@ -675,9 +565,9 @@ window.onload = () => {
                             temp_img = input_form[j]['value']
 
                             // ? add if not null
-                            if (temp_province != null || temp_province != undefined) {
-                                input_obj['province'] = temp_province
-                                input_obj['plate'] = temp_plate
+                            if (temp_img) {
+                                // input_obj['province'] = temp_province
+                                // input_obj['plate'] = temp_plate
                                 input_obj['img'] = temp_img
                             }
                             break
@@ -688,25 +578,36 @@ window.onload = () => {
                             // ? get value
                             temp_result = input_form[j]['value']
                             obj_result = stringToArr(temp_result)
+
+                            // * check
                             // console.log("obj_result123")
                             // console.log(obj_result)
 
 
-                            // temp_type = []
                             for (let arr in obj_result) {
+
+                                // * check
                                 // console.log("loop objresult" + arr)
                                 // console.log(obj_result[arr])
 
                                 switch (arr % 3) {
+
                                     case 0:
                                         if (obj_result[arr] != 0) {
+
                                             temp_brand = obj_result[arr]
+
+                                            // * check
                                             // console.log(temp_brand)
                                         } else {
+
                                             temp_brand = null
+
+                                            // * check
                                             // console.log("Null array")
                                         }
                                         break
+
                                     case 1:
                                         if (obj_result[arr] != 0) {
                                             temp_type = obj_result[arr]
@@ -716,27 +617,31 @@ window.onload = () => {
                                             // console.log("Null array")
                                         }
                                         break
+
                                     case 2:
                                         if (obj_result[arr] != 0) {
+
                                             temp_color = obj_result[arr]
+
+                                            // * check
                                             // console.log(temp_color)
                                         } else {
                                             temp_color = null
+
+                                            // * check
                                             // console.log("Null array")
                                         } break
                                 }
-
-                                // temp_type = obj_result[i]['type']
-                                // console.log("temp_type")
-                                // console.log(temp_type)
-
                             }
 
                             // ? add if not null
                             if (temp_province != null || temp_province != undefined) {
+
                                 input_obj['province'] = temp_province
                                 input_obj['plate'] = temp_plate
                                 input_obj['img'] = temp_img
+
+                                // * check
                                 // console.log(JSON.stringify(temp_brand))
                                 // console.log(JSON.stringify(temp_type))
                                 // console.log(JSON.stringify(temp_color))
@@ -816,76 +721,11 @@ window.onload = () => {
 
         // * check
         // console.log(input_obj)
-        // console.log("----------INPUT ARR--------------")
-        // console.log(input_arr)
-        // console.log("---------------------------------")
+        console.log("----------INPUT ARR--------------")
+        console.log(input_arr)
+        console.log("---------------------------------")
         // console.log(box_path)
 
-        // // ? empty arr
-        // arr = [];
-
-        // // ? loop create obj data
-        // j = 0
-        // for (var i = 0; i < input_arr.length; i++) {
-
-        //     // ? some of field increment is not match
-        //     // ? use j instead of i
-        //     if (i > j) {
-        //         j = j + 1
-        //     }
-
-        //     // console.log("input_arr : " + i)
-        //     // console.log(input_arr[i])
-
-        //     // * check
-        //     // console.log("i = " + i)
-        //     // console.log("j = " + j)
-
-        //     // ? create empty obj in loop
-        //     var obj = {};
-
-        //     obj['plate'] = input_arr[i]['plate'];
-        //     obj['province'] = input_arr[i]['province'];
-        //     obj['image'] = input_arr[i]['img'];
-
-        //     // ! old
-        //     // obj['image'] = box_path[j]
-
-        //     // * check
-        //     // console.log(sort_brand_arr[i])
-
-        //     // ? if get null set to "-"
-        //     if (sort_brand_arr[j] != null) {
-        //         brand = sort_brand_arr[j]['brand']
-        //     } else {
-        //         brand = "-"
-        //     }
-        //     obj['brand'] = brand
-
-        //     // ? if get null set to "-"
-        //     // console.log(sort_type_arr[i])
-        //     if (sort_type_arr[j] != null) {
-        //         type = sort_type_arr[j]['type']
-        //     } else {
-        //         type = "-"
-        //     }
-        //     obj['type'] = type
-
-        //     // ? if get null set to "-"
-        //     // console.log(sort_color_arr[i])
-        //     if (sort_color_arr[j] != null) {
-        //         color = sort_color_arr[j]['color']
-        //     } else {
-        //         color = "-"
-        //     }
-        //     obj['color'] = color
-
-        //     // ? push obj in arr
-        //     arr.push(obj);
-        // }
-
-        // // * check
-        // console.log(arr);
 
         // ? store arr in data 
         data = input_arr

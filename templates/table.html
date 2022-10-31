@@ -65,11 +65,11 @@
             "ordering": true,
             "bInfo": false,
             "autoWidth": true,
-            processing: true,
-            serverSide: true,
+            // processing: true,
+            // serverSide: true,
             ajax: {
                 url: '/api/table',
-                cache: false,
+                // cache: false,
                 "type": "POST",
                 // "data": function (data) {
                 //     console.log(data)
@@ -79,12 +79,12 @@
             columns: [
                 {
                     data: 'id',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '1%',
                 },
                 {
                     data: 'plate',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '1%',
                     "render": function (data, type, row) {
                         if (data != null) {
@@ -94,7 +94,7 @@
                 },
                 {
                     data: 'province',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '5%',
                     "render": function (data, type, row) {
                         if (data != null) {
@@ -104,7 +104,7 @@
                 },
                 {
                     data: 'brand',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '5%',
                     "render": function (data, type, row) {
                         if (data != null) {
@@ -114,7 +114,7 @@
                 },
                 {
                     data: 'type',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '5%',
                     "render": function (data, type, row) {
                         if (data != null) {
@@ -124,29 +124,29 @@
                 },
                 {
                     data: 'color',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '5%',
                     "render": function (data, type, row) {
                         if (data != null) {
                             return data.split("\n").join("<br/>");
                         } else {
-                            data = "-"
+                            data = "NULL"
                             return data
                         }
                     },
                 },
                 {
                     data: 'upload_date',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '5%',
                 },
                 {
                     data: 'image',
-                    "defaultContent": "-",
+                    "defaultContent": "NULL",
                     // width: '10%',
                     render: function (data, type, row) {
                         if (data === null || data === "") {
-                            return "-"
+                            return "NULL"
                         } else {
                             return `<a href="${data}" data-featherlight><img src="${data}" width="70%"></a>`;
                         }
