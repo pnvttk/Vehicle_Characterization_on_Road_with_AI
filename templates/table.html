@@ -65,7 +65,17 @@
             "ordering": true,
             "bInfo": false,
             "autoWidth": true,
-            ajax: '/api/table',
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/api/table',
+                cache: false,
+                "type": "POST",
+                // "data": function (data) {
+                //     console.log(data)
+                //     return data
+                // }
+            },
             columns: [
                 {
                     data: 'id',

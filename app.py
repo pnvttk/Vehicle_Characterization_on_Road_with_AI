@@ -21,7 +21,6 @@ import ast
 from cProfile import label
 from calendar import c
 from cmath import log
-from curses import echo
 from optparse import Values
 from urllib import response
 from sqlite3 import IntegrityError
@@ -433,7 +432,7 @@ def sendtoDB():
             try:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                                (plate, province, brand, car_type, color, upload_date, image_uploda))
+                               (plate, province, brand, car_type, color, upload_date, image_uploda))
                 conn.commit()
                 print("=======")
                 print("success")
@@ -456,7 +455,7 @@ def sendtoDB():
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' %
-                        (file_path, e))
+                          (file_path, e))
 
         return jsonify({'status': 'success'})
     return ('', 204)
@@ -469,32 +468,33 @@ def index():
 
 
 # # ? datatables
-@app.route("/api/table", methods=['POST', "GET"])
+@app.route("/api/table", methods=['POST'])
 def api_table():
-    cur = conn.cursor()
-    cur.execute('select * from detect_data')
-    tb_detect_data = cur.fetchall()
+    if request.method == 'POST':
+        cur = conn.cursor()
+        cur.execute('select * from detect_data')
+        tb_detect_data = cur.fetchall()
 
-    data = []
-    for row in tb_detect_data:
-        data.append({
-            'id': row[0],
-            'plate': row[1],
-            'province': row[2],
-            'brand': row[3],
-            'type': row[4],
-            'color': row[5],
-            'upload_date': row[6],
-            'image': row[7]
-        })
+        data = []
+        for row in tb_detect_data:
+            data.append({
+                'id': row[0],
+                'plate': row[1],
+                'province': row[2],
+                'brand': row[3],
+                'type': row[4],
+                'color': row[5],
+                'upload_date': row[6],
+                'image': row[7]
+            })
 
-    # print(data)
+        response = {
+            'aaData': data
+        }
 
-    response = {
-        'aaData': data
-    }
-
-    return jsonify(response)
+        return jsonify(response)
+    else:
+        return jsonify({'status': 'failed'})
 
 
 # # ? datatable path
@@ -514,6 +514,8 @@ def after_request(response):
     return response
 
 # ? Tuple to string
+
+
 def convertTuple(tup):
     st = ''.join(map(str, tup))
     return st
@@ -525,28 +527,32 @@ def Convert(string):
     return li
 
 # # Chart
+
+
 @ app.route("/chart", methods=['GET', 'POST'])
-def chart ():
+def chart():
 
     cur = conn.cursor()
-    cur.execute('SELECT brand_name FROM `brand`;') ## get brand for chart
-    brand_data = [item[0] for item in cur.fetchall()] ## get brand for chart
-    
-    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;') ## COUNT brand for chart
-    tb_detect_data1 = [cur.fetchall()] ## COUNT brand for chart
+    cur.execute('SELECT brand_name FROM `brand`;')  # get brand for chart
+    brand_data = [item[0] for item in cur.fetchall()]  # get brand for chart
 
-    ## convert a tuple to string
-    tuple_to_str = convertTuple(tb_detect_data1) 
+    # COUNT brand for chart
+    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;')
+    tb_detect_data1 = [cur.fetchall()]  # COUNT brand for chart
+
+    # convert a tuple to string
+    tuple_to_str = convertTuple(tb_detect_data1)
 
     ## ลบ , ()
-    re_str = re.compile('[,()]')  
-    re_str2 = re_str.sub('', str(tuple_to_str)) 
+    re_str = re.compile('[,()]')
+    re_str2 = re_str.sub('', str(tuple_to_str))
 
-    ## convert a string to list
-    str_to_list = (Convert(re_str2)) 
-    new_list = [item.strip("'") for item in str_to_list] ## ลบ ' 
+    # convert a string to list
+    str_to_list = (Convert(re_str2))
+    new_list = [item.strip("'") for item in str_to_list]  # ลบ '
 
-    return render_template('chart.html', brand_data=brand_data,new_list=new_list)
+    return render_template('chart.html', brand_data=brand_data, new_list=new_list)
+
 
 # ? server and port setup
 if __name__ == "__main__":
