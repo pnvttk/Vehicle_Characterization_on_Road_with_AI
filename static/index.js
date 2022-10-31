@@ -577,18 +577,19 @@ window.onload = () => {
 
                             // ? get value
                             temp_result = input_form[j]['value']
+                            console.log(temp_result)
                             obj_result = stringToArr(temp_result)
 
                             // * check
-                            // console.log("obj_result123")
-                            // console.log(obj_result)
+                            console.log("obj_result123")
+                            console.log(obj_result)
 
 
                             for (let arr in obj_result) {
 
                                 // * check
-                                // console.log("loop objresult" + arr)
-                                // console.log(obj_result[arr])
+                                console.log("loop objresult" + arr)
+                                console.log(obj_result[arr])
 
                                 switch (arr % 3) {
 
@@ -598,13 +599,14 @@ window.onload = () => {
                                             temp_brand = obj_result[arr]
 
                                             // * check
-                                            // console.log(temp_brand)
+                                            console.log("temp_brand")
+                                            console.log(temp_brand)
                                         } else {
 
                                             temp_brand = null
 
                                             // * check
-                                            // console.log("Null array")
+                                            console.log("Null array")
                                         }
                                         break
 
@@ -637,6 +639,8 @@ window.onload = () => {
                             // ? add if not null
                             if (temp_province != null || temp_province != undefined) {
 
+                                input_obj['brand'] = temp_brand
+                                input_obj['type'] = temp_type
                                 input_obj['province'] = temp_province
                                 input_obj['plate'] = temp_plate
                                 input_obj['img'] = temp_img
@@ -826,18 +830,19 @@ function stringToArr(string) {
                 if (brand == c_result_arr[i]) {
 
                     // * check
-                    // console.log("match brand : " + c_result_arr[i])
+                    console.log("match brand : " + c_result_arr[i])
 
                     // ? pass match variable
                     sort_brand_obj["brand"] = c_result_arr[i]
 
                     // ? set staus not insert null
                     brand_status = true
+                    sort_brand_arr.push(sort_brand_obj)
                 }
                 if (brand_status != true) {
 
                     // * check
-                    // console.log("brand status != true add null")
+                    console.log("brand status != true add null")
 
                     // ? insert null
                     sort_brand_obj["brand"] = null
