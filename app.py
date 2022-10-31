@@ -541,7 +541,8 @@ def chart():
     tuple_to_str = convertTuple(count_brand_data) 
 
     # convert a tuple to string
-    tuple_to_str = convertTuple(tb_detect_data1)
+    re_str = re.compile('[,()]')  
+    re_str2 = re_str.sub('', str(tuple_to_str)) 
 
     ## convert a string to list
     str_to_list = (Convert(re_str2)) 
