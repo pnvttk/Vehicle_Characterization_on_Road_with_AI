@@ -176,6 +176,10 @@ def mask_image():
         ocr_txt = {}
         # ? json to push to frontend
         json_ocr_txt = {}
+
+        motorcycle = {}
+
+        # ? check if detect any thing
         if len(info) != 0:
 
             # print("[INFO] : results name")
@@ -306,6 +310,36 @@ def mask_image():
                     i = int(i)+1
                     # print(i)
 
+                # ? if not detect plate
+                elif getClass_name == 'Motorcycle':
+                    print("=-=-= Detect Motorcycle =-=-=")
+
+                    # print('[INFO] Croping image.')
+
+                    # ? crop plate and save in unique directory
+                    results.crop(save_dir="results/" + new_name)
+
+                    # ? temp box path to access to crop image
+                    box_path = str("./results/" + new_name +
+                                   '/image0.jpg')
+
+                    motorcycle[i] = {}
+                    motorcycle[i]["plate"] = None
+                    motorcycle[i]["province"] = None
+                    motorcycle[i]['type'] = "Motorcycle"
+
+                # # ? if not detect plate
+                # else:
+                #     print("=-=-= Detect something without plate =-=-=")
+                #     # print('[INFO] Croping image.')
+
+                #     # ? crop plate and save in unique directory
+                #     results.crop(save_dir="results/" + new_name)
+
+                #     # ? temp box path to access to crop image
+                #     box_path = str("./results/" + new_name +
+                #                    '/image0.jpg')
+
                 # ? because image1 not exist
                 # ? add 1 i = 2
                 if i == 1:
@@ -318,9 +352,11 @@ def mask_image():
         # ? if results not detect any thing
         else:
             # ? return alert msg to ajax
+            print("----- Cannot detect any thing -----")
+
             return jsonify({'alert': "alert('error')"})
 
-        print("[PAYLOAD] : ", json_ocr_txt)
+        print("[PAYLOAD] EasyOCR : ", json_ocr_txt)
         print("|")
 
         rows = 5
@@ -344,13 +380,18 @@ def mask_image():
             'status': str(b64str),
             'count_result': str(count_result),
             'json_ocr_txt': json_ocr_txt,
-            'box_path': str(box_path)
+            'box_path': str(box_path),
+            'motorcycle': motorcycle
         }
 
         # ? store obj in array with index
         payload[loop_time] = final_payload
 
         # print(loop_time)
+
+    # * check
+    # print("[PAYLOAD] Final payload : ", payload)
+    # print("|")
 
     return jsonify(payload)
 
@@ -366,66 +407,104 @@ def sendtoDB():
 
         print("[INFO] GET DATA FROM FRONTEND")
         print("|")
+        print(data_json)
+        print("|")
+        print("[INFO] END DATA FROM FRONTEND")
+        print("")
+
+    # # # ! for debug
+    #     for data in data_json:
+    #         print(data)
+    #         if data:
+    #             print("dict1 Not Empty")
+    #         else:
+    #             print("dict1 is Empty")
+    # quit()
+    # for test in data:
+    #     # # ! ---------------
 
         # ? Loop through json
         for data in data_json:
+            if data:
 
-            # print(data)
+                # ? convert json to object
+                plate = data['plate']
+                province = data['province']
+                brand = data['brand']
+                car_type = data['type']
+                color = data['color']
 
-            # ? convert json to object
-            plate = data['plate']
-            province = data['province']
-            brand = data['brand']
-            car_type = data['type']
-            color = data['color']
+                plate.replace(' ', '\n')
+                province.replace(' ', '\n')
 
-            plate.replace(' ', '\n')
-            province.replace(' ', '\n')
+                # ? random hex for img name
+                random_p = uuid.uuid4().hex
 
-            # ? random hex for img name
-            random_p = uuid.uuid4().hex
+                # ? copy ./result/image to ./static/upload
+                original = data['img']
+                target = "./static/upload/" + random_p + ".jpg"
+                image_uploda = target
+                shutil.copyfile(original, target)
 
-            # ? copy ./result/image to ./static/upload
-            original = data['img']
-            target = "./static/upload/" + random_p + ".jpg"
-            image_uploda = target
-            shutil.copyfile(original, target)
+                # ? if empty set to None
+                if plate == "":
+                    plate = "NULL"
+                if province == "":
+                    province = "NULL"
+                if brand == "":
+                    brand = "NULL"
+                if car_type == "":
+                    car_type = "NULL"
+                if color == "":
+                    color = "NULL"
 
-            # ? if empty set to None
-            if plate == "":
-                plate = None
-            if province == "":
-                province = None
-            if brand == "":
-                brand = None
-            if car_type == "":
-                car_type = None
-            if color == "":
-                color = None
+                now = datetime.now()
+                # print("date and time:", date_time)
 
-            now = datetime.now()
-            # print("date and time:", date_time)
+                # ? set format
+                date_time = now.strftime("%m/%d/%Y, %H:%M")
+                # print("date and time:", date_time)
+                # ? pass to variable
+                upload_date = date_time
 
-            # ? set format
-            date_time = now.strftime("%m/%d/%Y, %H:%M")
-            # print("date and time:", date_time)
-            # ? pass to variable
-            upload_date = date_time
+                # # * check
+                # print("[ Check before push to db ]")
+                # print(plate)
+                # print(province)
+                # print(brand)
+                # print(car_type)
+                # print(color)
+                # print(upload_date)
+                # print(image_uploda)
 
-            # ? try catch when commit to database
-            try:
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                               (plate, province, brand, car_type, color, upload_date, image_uploda))
-                conn.commit()
-                print("=======")
-                print("success")
-                print("=======")
+                # ? try catch when commit to database
+                try:
+                    # conn = pymysql.connect(host='localhost',
+                    #                        user='root',
+                    #                        passwd='',
+                    #                        db='flask'
+                    #                        #    cursorclass=pymysql.cursors.DictCursor
+                    #                        )
+                    sql = (
+                        "INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+                    # pymysql.connections.ping()
+                    cursor = conn.cursor()
+                    # cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    #                (plate, province, brand, car_type, color, upload_date, image_uploda))
+                    cursor.execute(sql,
+                                   (plate, province, brand, car_type,
+                                    color, upload_date, image_uploda)
+                                   )
 
-            except pymysql.IntegrityError:
-                print("=======")
-                print("failed")
-                print("=======")
+                    conn.commit()
+                    print("=======")
+                    print("success")
+                    print("=======")
+
+                except pymysql.IntegrityError:
+                    print("=======")
+                    print("failed")
+                    print("=======")
 
     commit_status = True
 
@@ -519,63 +598,66 @@ def Convert(string):
 def chart():
 
     cur = conn.cursor()
-    cur.execute('SELECT brand_name FROM `brand`;') ## get brand for chart
-    brand_data = [item[0] for item in cur.fetchall()] ## get brand for chart
+    cur.execute('SELECT brand_name FROM `brand`;')  # get brand for chart
+    brand_data = [item[0] for item in cur.fetchall()]  # get brand for chart
 
-    cur.execute('SELECT type_name FROM `type`;') 
+    cur.execute('SELECT type_name FROM `type`;')
     type_data = [item[0] for item in cur.fetchall()]
 
-    cur.execute('SELECT color_name FROM `color`;') 
-    color_data = [item[0] for item in cur.fetchall()] 
-    
-    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;') ## COUNT brand for chart
-    count_brand_data = [cur.fetchall()] ## COUNT brand for chart
+    cur.execute('SELECT color_name FROM `color`;')
+    color_data = [item[0] for item in cur.fetchall()]
 
-    cur.execute('SELECT COUNT(detect_data.type) FROM type LEFT JOIN detect_data on type.type_name = detect_data.type GROUP BY type.type_name ORDER BY type_id;') ## COUNT brand for chart
+    # COUNT brand for chart
+    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;')
+    count_brand_data = [cur.fetchall()]  # COUNT brand for chart
+
+    # COUNT brand for chart
+    cur.execute('SELECT COUNT(detect_data.type) FROM type LEFT JOIN detect_data on type.type_name = detect_data.type GROUP BY type.type_name ORDER BY type_id;')
     count_type_data = [cur.fetchall()]
 
-    cur.execute('SELECT COUNT(detect_data.color) FROM color LEFT JOIN detect_data on color.color_name = detect_data.color GROUP BY color.color_name ORDER BY color_id;') ## COUNT brand for chart
-    count_color_data = [cur.fetchall()] 
-
-    ## convert a tuple to string
-    tuple_to_str = convertTuple(count_brand_data) 
+    # COUNT brand for chart
+    cur.execute('SELECT COUNT(detect_data.color) FROM color LEFT JOIN detect_data on color.color_name = detect_data.color GROUP BY color.color_name ORDER BY color_id;')
+    count_color_data = [cur.fetchall()]
 
     # convert a tuple to string
-    re_str = re.compile('[,()]')  
-    re_str2 = re_str.sub('', str(tuple_to_str)) 
+    tuple_to_str = convertTuple(count_brand_data)
 
-    ## convert a string to list
-    str_to_list = (Convert(re_str2)) 
-    list_brand = [item.strip("'") for item in str_to_list] ## ลบ ' 
+    # convert a tuple to string
+    re_str = re.compile('[,()]')
+    re_str2 = re_str.sub('', str(tuple_to_str))
 
-    ## ----------------------------------------------------------------
+    # convert a string to list
+    str_to_list = (Convert(re_str2))
+    list_brand = [item.strip("'") for item in str_to_list]  # ลบ '
 
-    ## convert a tuple to string
-    tuple_to_str1 = convertTuple(count_type_data) 
+    # ----------------------------------------------------------------
+
+    # convert a tuple to string
+    tuple_to_str1 = convertTuple(count_type_data)
 
     ## ลบ , ()
-    re_str3 = re.compile('[,()]')  
-    re_str4 = re_str3.sub('', str(tuple_to_str1)) 
+    re_str3 = re.compile('[,()]')
+    re_str4 = re_str3.sub('', str(tuple_to_str1))
 
-    ## convert a string to list
-    str_to_list1 = (Convert(re_str4)) 
+    # convert a string to list
+    str_to_list1 = (Convert(re_str4))
     list_type = [item.strip("'") for item in str_to_list1]
 
     ## ----------------------------------------------------------------
 
-    ## convert a tuple to string
-    tuple_to_str2 = convertTuple(count_color_data) 
+    # convert a tuple to string
+    tuple_to_str2 = convertTuple(count_color_data)
 
     ## ลบ , ()
-    re_str5 = re.compile('[,()]')  
-    re_str6 = re_str5.sub('', str(tuple_to_str2)) 
+    re_str5 = re.compile('[,()]')
+    re_str6 = re_str5.sub('', str(tuple_to_str2))
 
-    ## convert a string to list
-    str_to_list2 = (Convert(re_str6)) 
+    # convert a string to list
+    str_to_list2 = (Convert(re_str6))
     list_color = [item.strip("'") for item in str_to_list2]
 
+    return render_template('chart.html', brand_data=brand_data, type_data=type_data, color_data=color_data, list_brand=list_brand, list_type=list_type, list_color=list_color)
 
-    return render_template('chart.html', brand_data=brand_data,type_data=type_data,color_data=color_data,list_brand=list_brand,list_type=list_type,list_color=list_color)
 
 # ? server and port setup
 if __name__ == "__main__":

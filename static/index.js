@@ -226,6 +226,7 @@ window.onload = () => {
                         a_msg = data[i]['alert']
                         bytestring = data[i]['status']
                         ocr_txt = data[i]['json_ocr_txt']
+                        motorcycle_obj = data[i]['motorcycle']
                         count_result = data[i]['count_result']
                         box_path_hidden = data[i]['box_path']
                         box_path.push(data[i]['box_path'])
@@ -246,8 +247,17 @@ window.onload = () => {
                         // ? class bootstap floating text
                         div_car_img.setAttribute("id", "image" + num);
 
-                        // ? appaend to input_box
                         input_box.append(div_car_img)
+
+
+                        // ? div for cars 
+                        div_car = document.createElement('div')
+
+                        // ? set attr
+                        div_car.setAttribute("id", "car" + num)
+
+                        // ? appaend to div car img
+                        div_car_img.append(div_car)
 
 
                         // ? if get counts result 
@@ -320,7 +330,11 @@ window.onload = () => {
                         }
 
                         // ? if get ocr text
-                        if (ocr_txt != undefined) {
+                        if (ocr_txt && Object.keys(ocr_txt).length != 0) {
+
+                            // console.log("ocr_txt not empty")
+                            // console.log(ocr_txt)
+                            // console.log(typeof ocr_txt)
 
                             // ? show upload to db button
                             document.getElementById('sendtoDB').style.display = "block";
@@ -379,7 +393,7 @@ window.onload = () => {
                                     div_elm.setAttribute("class", "form-floating");
 
                                     // ? appaend to input_box
-                                    div_car_img.append(div_elm)
+                                    div_car.append(div_elm)
 
                                     // ? create input element
                                     input_elm = document.createElement('input')
@@ -419,7 +433,7 @@ window.onload = () => {
                                 input_hiden.value = data[i]['box_path']
 
                                 // ? append to div element
-                                div_car_img.append(input_hiden)
+                                div_car.append(input_hiden)
 
                                 // * check
                                 // console.log("box path : " + data[i]['box_path'])
@@ -435,13 +449,74 @@ window.onload = () => {
                                 c_result_hidden_input.value = c_result_arr[i]
 
                                 // ? append to div element
-                                div_car_img.append(c_result_hidden_input)
+                                div_car.append(c_result_hidden_input)
 
                                 // * check
                                 // console.log("c_result_hiden : " + c_result_arr + " " + i)
                                 // console.log("box path : " + data[i]['box_path'])
 
                             }
+                        }
+                        if (motorcycle_obj && Object.keys(motorcycle_obj).length != 0) {
+                            // ? if not get ocr_txt
+
+                            // * check
+                            // console.log("[ Get motorcycle ]")
+
+                            // ? show upload to db button
+                            document.getElementById('sendtoDB').style.display = "block";
+
+
+                            // console.log("motorcycle_obj")
+                            // console.log(data)
+
+                            // for (k in motorcycle_obj) {
+
+                            // console.log("mmmmmmmmmmmmmmmmmmmmmmmmmmm")
+                            // console.log(i)
+                            // console.log(parseInt(k))
+                            // console.log(motorcycle_obj[k])
+
+                            // ? div for motorcycle
+                            div_mtc = document.createElement('div')
+
+                            // ? set attr
+                            div_mtc.setAttribute("id", "mtc" + i)
+
+                            // ? append to input box
+                            input_box.append(div_mtc)
+
+
+                            // ? hidden input image path 
+                            input_m_hiden = document.createElement('input')
+
+                            // ? set attr
+                            input_m_hiden.type = "hidden";
+                            input_m_hiden.id = "image" + i;
+                            input_m_hiden.value = data[i]['box_path']
+
+                            // ? append to div element
+                            div_mtc.append(input_m_hiden)
+
+                            // * check
+                            // console.log("box path : " + data[i]['box_path'])
+                            // console.log("box path : " + data[i]['box_path'])
+
+                            //? hidden input c_result path 
+                            m_result_hidden_input = document.createElement('input')
+
+                            // ? set attr
+                            m_result_hidden_input.type = "hidden";
+                            m_result_hidden_input.id = "result" + i;
+                            m_result_hidden_input.value = c_result_arr[i]
+
+                            // ? append to div element
+                            div_mtc.append(m_result_hidden_input)
+
+                            // * check
+                            // console.log("c_result_hiden : " + c_result_arr + " " + i)
+                            // console.log("box path : " + data[i]['box_path'])
+                            // }
                         }
 
 
@@ -474,182 +549,455 @@ window.onload = () => {
         temp_result = null
         for (let i = 0; i < num; i++) {
 
+            console.log("num  = " + num)
+            console.log("i  = " + i)
+
+
             // * console.log("check")
-            // console.log("-------------------------------------------------------")
-            // console.log(div_car_img)/
+            console.log("----------------------CAR----------------------")
+            // console.log(div_car_img)
 
             // ? get all input spilt by image div
             div_car_img = "image" + (i + 1)
-            input_form = document.getElementById(div_car_img).getElementsByTagName('input')
+            get_div_car_img = document.getElementById(div_car_img)
+
+            // console.log("input_form === GETING")
+
+
+            if (get_div_car_img !== null) {
+
+                // ? get div car
+                div_car = "car" + (i + 1)
+                get_div_car = document.getElementById(div_car)
+
+                if (get_div_car !== null) {
+                    console.log("get element input ------------------------------------****")
+
+                    get_input_form = get_div_car.getElementsByTagName('input')
+
+
+                    if (get_input_form && Object.keys(get_input_form).length != 0) {
+
+                        input_form = get_input_form
+
+                        // * check
+                        // console.log("input_form.length")
+                        // console.log(input_form.length)
+                        // console.log(input_form)
+                    }
+                } else {
+                    console.log("input_form === null")
+                    input_form = null
+                    console.log("input_form === null")
+                }
+            }
+
+            if (input_form && Object.keys(input_form).length !== 0) {
+
+
+                console.log("[INPUT FORM] get input from car")
+                // console.log(input_form.length)
+                console.log(input_form)
+                console.log("[INPUT FORM] get input from car")
+
+                // ? loop get only id, value
+                for (j in input_form) {
+
+                    // ? empty input arr
+                    var input_obj = {}
+                    input_obj['plate'] = j
+                    input_obj['province'] = j + 1
+                    input_obj['img'] = j + 2
+                    input_obj['brand'] = j + 3
+                    input_obj['type'] = j + 4
+                    input_obj['color'] = j + 5
+
+                    // console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+                    // console.log()
+
+                    if (input_form[j]) {
+                        if (input_form[j]["id"] && input_form[j]["value"]) {
+
+                            // * check
+                            console.log("loop : " + j)
+                            console.log("id : " + input_form[j]['id'] + " | value :" + input_form[j]['value'])
+
+                            // throw new Error("stop");
+
+                            // ? case for spilt 3 key and value
+                            switch (j % 4) {
+                                case 0:
+
+                                    // * check
+                                    // console.log("get plate : " + input_form[j]['value'])
+
+                                    // ? get value
+                                    temp_plate = input_form[j]['value']
+
+                                    // ? add if not null 
+                                    if (temp_plate) {
+
+                                        // * check
+                                        console.log("push [" + temp_plate + "] to temp_plate")
+
+                                        input_obj['plate'] = temp_plate
+                                    } else {
+
+                                        // * check
+                                        console.log("TEMP PLATE IS NULL")
+
+                                        temp_plate = "NULL"
+                                        input_obj['plate'] = temp_plate
+                                    }
+                                    break
+                                case 1:
+
+                                    // * check
+                                    // console.log("get province : " + input_form[j]['value'])
+
+                                    // ? get value
+                                    temp_province = input_form[j]['value']
+
+                                    // ? add if not null
+                                    if (temp_province) {
+
+                                        // * check
+                                        console.log("push [" + temp_province + "] to temp_province")
+
+                                        input_obj['province'] = temp_province
+                                        // input_obj['plate'] = temp_plate
+                                    } else {
+
+                                        // * check
+                                        console.log("TEMP PROVINCE IS NULL")
+
+                                        temp_province = "NULL"
+                                        input_obj['province'] = temp_province
+
+                                    }
+                                    break
+                                case 2:
+
+                                    // * check
+                                    // console.log("get image path : " + input_form[j]['value'])
+
+                                    // ? get value
+                                    temp_img = input_form[j]['value']
+
+                                    // ? add if not null
+                                    if (temp_img) {
+                                        // input_obj['province'] = temp_province
+                                        // input_obj['plate'] = temp_plate
+
+                                        // * check
+                                        console.log("push [" + temp_img + "] to temp_img")
+                                        input_obj['img'] = temp_img
+                                    } else {
+                                        console.log("TEMP IMG IS NULL")
+                                        temp_img = "Null"
+                                        input_obj['img'] = temp_img
+                                    }
+                                    break
+                                case 3:
+                                    // * check
+                                    // console.log("get result path : " + input_form[j]['value'])
+
+                                    // ? get value
+                                    temp_result = input_form[j]['value']
+                                    console.log("GET [" + temp_result + "] ")
+                                    console.log(temp_result)
+                                    console.log("using stringToArr func")
+                                    obj_result = stringToArr(temp_result)
+
+                                    // * check
+                                    console.log("[Object RESULT]")
+                                    console.log(obj_result)
+
+
+                                    for (let arr in obj_result) {
+
+                                        // * check
+                                        // console.log("loop objresult" + arr)
+                                        // console.log(obj_result[arr])
+
+                                        switch (arr % 3) {
+
+                                            case 0:
+                                                if (obj_result[arr] != 0) {
+
+                                                    temp_brand = obj_result[arr]
+
+                                                    // * check
+                                                    console.log("temp_brand")
+                                                    console.log(temp_brand)
+                                                } else {
+
+                                                    temp_brand = null
+
+                                                    // * check
+                                                    console.log("brand = NULL")
+                                                }
+                                                break
+
+                                            case 1:
+                                                if (obj_result[arr] != 0) {
+                                                    temp_type = obj_result[arr]
+                                                    console.log(temp_type)
+                                                } else {
+                                                    temp_type = null
+                                                    console.log("type = NULL")
+                                                }
+                                                break
+
+                                            case 2:
+                                                if (obj_result[arr] != 0) {
+
+                                                    temp_color = obj_result[arr]
+
+                                                    // * check
+                                                    console.log(temp_color)
+                                                } else {
+                                                    temp_color = null
+
+                                                    // * check
+                                                    console.log("color = NULL")
+                                                } break
+                                        }
+                                    }
+
+                                    // ? add if not null
+                                    // if (temp_province != null || temp_province != undefined) {
+
+                                    input_obj['brand'] = temp_brand
+                                    input_obj['type'] = temp_type
+                                    input_obj['province'] = temp_province
+                                    input_obj['plate'] = temp_plate
+                                    input_obj['img'] = temp_img
+
+                                    // * check
+                                    // console.log(JSON.stringify(temp_brand))
+                                    // console.log(JSON.stringify(temp_type))
+                                    // console.log(JSON.stringify(temp_color))
+
+                                    if (temp_brand != null) {
+                                        var temp_brand = temp_brand.map(function (brand) {
+                                            return brand['brand'];
+                                        });
+
+                                        // ? arr to string
+                                        temp_brand = temp_brand.toString()
+
+                                        // ? replace , with newline
+                                        temp_brand = temp_brand.replace(/,/g, '\n');
+
+                                        // * check
+                                        // console.log(temp_brand)
+                                    }
+
+                                    if (temp_type != null) {
+                                        var temp_type = temp_type.map(function (type) {
+                                            return type['type'];
+                                        });
+
+                                        // ? arr to string
+                                        temp_type = temp_type.toString()
+
+                                        // ? replace , with newline
+                                        temp_type = temp_type.replace(/,/g, '\n');
+
+                                        // * check
+                                        // console.log(temp_type)
+                                    }
+
+                                    if (temp_color != null) {
+                                        var temp_color = temp_color.map(function (color) {
+                                            return color['color'];
+                                        });
+
+                                        // ? arr to string
+                                        temp_color = temp_color.toString()
+
+                                        // ? replace , with newline
+                                        temp_color = temp_color.replace(/,/g, '\n');
+
+                                        // * check
+                                        // console.log(temp_color)
+                                    }
+
+                                    input_obj['brand'] = temp_brand
+                                    input_obj['type'] = temp_type
+                                    input_obj['color'] = temp_color
+                                    // }
+                                    break
+
+                            }
+
+                            // ? push to arr and reset temp variable
+                            if (temp_plate && temp_province && temp_img && temp_result) {
+
+                                // ? check
+                                console.log("************ push obj car ************")
+
+                                // ? push obj to arr
+                                input_arr.push(input_obj)
+
+                                // ? reset temp variable
+                                temp_plate = null
+                                temp_province = null
+                                temp_img = null
+                                temp_result = null
+                            }
+                        }
+                    }
+                }
+            } else {
+                console.log("[ input form empty ]")
+            }
+
+            // ? get all input spilt by image div
+            console.log("----------------------MOTORCYCLE----------------------")
+            // console.log(div_mtc)
+
+            div_mtc = "mtc" + (i)
+            get_div_mtc = document.getElementById(div_mtc)
+
+            // console.log("div_mtc + " + i)
+            // console.log(div_mtc)
+
+            if (get_div_mtc !== null) {
+                mtc_input_form = get_div_mtc.getElementsByTagName('input')
+                console.log(mtc_input_form)
+            } else {
+                console.log("mtc_input_form === null")
+                mtc_input_form = null
+            }
 
             // * check
             // console.log("input_form : " + i)
             // console.log(input_form)
+            // console.log(typeof input_form)
 
-            // ? loop get only id, value
-            for (j in input_form) {
+            if (mtc_input_form && Object.keys(mtc_input_form).length != 0) {
+                console.log("[ Get mtc input form ]")
 
-                // ? empty input arr
-                var input_obj = {}
-                input_obj['plate'] = j
-                input_obj['province'] = j + 1
-                input_obj['img'] = j + 2
-                input_obj['brand'] = j + 3
-                input_obj['type'] = j + 4
-                input_obj['color'] = j + 5
+                for (j in mtc_input_form) {
 
-                if (input_form[j]["id"] && input_form[j]["value"] != undefined) {
 
-                    // * check
-                    // console.log("loop : " + j)
-                    // console.log(input_form[j]['value'])
+                    // ? empty input arr
+                    var input_obj = {}
+                    // input_obj['img'] = j
+                    // input_obj['province'] = j + 1
+                    // input_obj['plate'] = j + 2
+                    // input_obj['brand'] = j + 3
+                    // input_obj['type'] = j + 1
+                    // input_obj['color'] = j + 2
 
-                    // ? case for spilt 3 key and value
-                    switch (j % 4) {
-                        case 0:
 
-                            // * check
-                            // console.log("get plate : " + input_form[j]['value'])
+                    if (mtc_input_form[j]["id"] && mtc_input_form[j]["value"] != undefined) {
 
-                            // ? get value
-                            temp_plate = input_form[j]['value']
+                        // * check
+                        console.log("[ MTC loop : " + j + " ]")
+                        // console.log(mtc_input_form[j]['value'])
 
-                            // ? add if not null 
-                            if (temp_plate) {
+                        switch (j % 2) {
+
+                            case 0:
 
                                 // * check
-                                // console.log("push =>" + temp_plate + "<=")
+                                console.log("get image path : " + mtc_input_form[j]['value'])
 
-                                input_obj['plate'] = temp_plate
-                            } else {
+                                // ? get value
+                                temp_img = mtc_input_form[j]['value']
+                                console.log("MTC case 0 get [image]")
+
+                                // // ? add if not null
+                                // if (temp_img) {
+                                //     // input_obj['province'] = temp_province
+                                //     // input_obj['plate'] = temp_plate
+                                //     input_obj['img'] = temp_img
+                                // }
+                                break
+
+                            case 1:
+                                // * check
+                                console.log("get result : " + mtc_input_form[j]['value'])
+
+                                // ? get value
+                                temp_result = mtc_input_form[j]['value']
+                                // console.log("MTC case 1 get [result]")
 
                                 // * check
-                                // console.log("TEMP PLATE IS NULL")
-
-                                temp_plate = "NULL"
-                                input_obj['plate'] = temp_plate
-                            }
-                            break
-                        case 1:
-
-                            // * check
-                            // console.log("get province : " + input_form[j]['value'])
-
-                            // ? get value
-                            temp_province = input_form[j]['value']
-
-                            // ? add if not null
-                            if (temp_province) {
-
-                                // * check
-                                // console.log("push =>" + temp_plate + "<=")
-
-                                input_obj['province'] = temp_province
-                                // input_obj['plate'] = temp_plate
-                            } else {
-
-                                // * check
-                                // console.log("TEMP PROVINCE IS NULL")
-
-                                temp_province = "NULL"
-                                input_obj['province'] = temp_province
-
-                            }
-                            break
-                        case 2:
-
-                            // * check
-                            // console.log("get image path : " + input_form[j]['value'])
-
-                            // ? get value
-                            temp_img = input_form[j]['value']
-
-                            // ? add if not null
-                            if (temp_img) {
-                                // input_obj['province'] = temp_province
-                                // input_obj['plate'] = temp_plate
-                                input_obj['img'] = temp_img
-                            }
-                            break
-                        case 3:
-                            // * check
-                            // console.log("get result path : " + input_form[j]['value'])
-
-                            // ? get value
-                            temp_result = input_form[j]['value']
-                            console.log(temp_result)
-                            obj_result = stringToArr(temp_result)
-
-                            // * check
-                            console.log("obj_result123")
-                            console.log(obj_result)
+                                console.log("[ MTC result to string ]")
+                                obj_result = stringToArr(temp_result)
+                                console.log(obj_result)
 
 
-                            for (let arr in obj_result) {
+                                for (let arr in obj_result) {
 
-                                // * check
-                                console.log("loop objresult" + arr)
-                                console.log(obj_result[arr])
+                                    // * check
+                                    // console.log(" MTC loop obj result" + arr)
+                                    // console.log(obj_result[arr])
 
-                                switch (arr % 3) {
+                                    switch (arr % 3) {
 
-                                    case 0:
-                                        if (obj_result[arr] != 0) {
+                                        case 0:
+                                            if (obj_result[arr] != 0) {
 
-                                            temp_brand = obj_result[arr]
+                                                temp_brand = obj_result[arr]
 
-                                            // * check
-                                            console.log("temp_brand")
-                                            console.log(temp_brand)
-                                        } else {
+                                                // * check
+                                                console.log("MTC brand GET")
+                                                console.log(temp_brand)
+                                            } else {
 
-                                            temp_brand = null
+                                                temp_brand = null
 
-                                            // * check
-                                            console.log("Null array")
-                                        }
-                                        break
+                                                // * check
+                                                console.log("MTC brand = NULL")
+                                            }
+                                            break
 
-                                    case 1:
-                                        if (obj_result[arr] != 0) {
-                                            temp_type = obj_result[arr]
-                                            // console.log(temp_type)
-                                        } else {
-                                            temp_type = null
-                                            // console.log("Null array")
-                                        }
-                                        break
+                                        case 1:
+                                            if (obj_result[arr] != 0) {
+                                                temp_type = obj_result[arr]
+                                                console.log("MTC type GET")
+                                                console.log(temp_type)
+                                            } else {
+                                                temp_type = null
+                                                console.log("MTC type = NULL")
+                                            }
+                                            break
 
-                                    case 2:
-                                        if (obj_result[arr] != 0) {
+                                        case 2:
+                                            if (obj_result[arr] != 0) {
 
-                                            temp_color = obj_result[arr]
+                                                temp_color = obj_result[arr]
 
-                                            // * check
-                                            // console.log(temp_color)
-                                        } else {
-                                            temp_color = null
+                                                // * check
+                                                console.log("MTC type GET")
+                                                console.log(temp_color)
+                                            } else {
+                                                temp_color = null
 
-                                            // * check
-                                            // console.log("Null array")
-                                        } break
+                                                // * check
+                                                console.log("MTC color = NULL")
+                                            } break
+                                    }
                                 }
-                            }
 
-                            // ? add if not null
-                            if (temp_province != null || temp_province != undefined) {
+                                // ? add if not null
+                                // if (temp_province != null || temp_province != undefined) {
 
                                 input_obj['brand'] = temp_brand
                                 input_obj['type'] = temp_type
-                                input_obj['province'] = temp_province
-                                input_obj['plate'] = temp_plate
+                                input_obj['province'] = "NULL"
+                                input_obj['plate'] = "NULL"
                                 input_obj['img'] = temp_img
 
                                 // * check
                                 // console.log(JSON.stringify(temp_brand))
                                 // console.log(JSON.stringify(temp_type))
                                 // console.log(JSON.stringify(temp_color))
-
                                 if (temp_brand != null) {
                                     var temp_brand = temp_brand.map(function (brand) {
                                         return brand['brand'];
@@ -663,6 +1011,9 @@ window.onload = () => {
 
                                     // * check
                                     // console.log(temp_brand)
+                                } else {
+                                    // console.log("set temp brand to NULL")
+                                    temp_brand = "NULL"
                                 }
 
                                 if (temp_type != null) {
@@ -678,6 +1029,8 @@ window.onload = () => {
 
                                     // * check
                                     // console.log(temp_type)
+                                } else {
+                                    temp_type = "NULL"
                                 }
 
                                 if (temp_color != null) {
@@ -693,42 +1046,84 @@ window.onload = () => {
 
                                     // * check
                                     // console.log(temp_color)
+                                } else {
+                                    temp_color = "NULL"
                                 }
 
                                 input_obj['brand'] = temp_brand
                                 input_obj['type'] = temp_type
                                 input_obj['color'] = temp_color
-                            }
-                            break
+                                // }
+                                break
 
+                        }
+                        // ? push to arr and reset temp variable
+                        if (temp_type && temp_color) {
+
+                            // ? check
+                            console.log("************ push obj motorcycle ************")
+
+                            // ? push obj to arr
+                            input_arr.push(input_obj)
+
+                            // ? reset temp variable
+                            temp_plate = null
+                            temp_province = null
+                            // temp_img = null
+                            temp_result = null
+                        }
                     }
 
-                    // ? push to arr and reset temp variable
-                    if (temp_plate && temp_province && temp_img && temp_result != null) {
+                    console.log("----------------------END MOTORCYCLE----------------------")
 
-                        // ? check
-                        // console.log("************ push obj ************")
-
-                        // ? push obj to arr
-                        input_arr.push(input_obj)
-
-                        // ? reset temp variable
-                        temp_plate = null
-                        temp_province = null
-                        temp_img = null
-                        temp_result = null
-                    }
                 }
+            } else {
+                console.log("[ motorcycle input is empty ]")
             }
-
         }
 
+
+
+
         // * check
-        // console.log(input_obj)
         console.log("----------INPUT ARR--------------")
         console.log(input_arr)
         console.log("---------------------------------")
-        // console.log(box_path)
+
+
+        // * check
+        console.log("----------Remove Empty ARR--------------")
+        input_arr = input_arr.filter(e => {
+            if (Object.keys(e).length !== 0) {
+                return true
+            }
+            return false
+        })
+        console.log(input_arr)
+        console.log("---------------------------------")
+
+
+        console.log("----------Remove duplicate ARR--------------")
+        // input_arr = input_arr.filter((value, index, self) =>
+        //     index === self.findIndex((t) => (
+        //         t.place === value.place && t.name === value.name
+        //     ))
+        // )
+
+        let remove_dup = input_arr.filter(
+            (obj, index) => index === input_arr.findIndex(
+                other => obj.plate === other.plate
+                    && obj.province === other.province
+                    && obj.brand === other.brand
+                    && obj.color === other.color
+            ));
+        console.log(remove_dup);
+
+        input_arr = remove_dup
+
+        // console.log(input_arr)
+        console.log("---------------------------------")
+
 
 
         // ? store arr in data 
@@ -768,8 +1163,8 @@ window.onload = () => {
             success: function (response) {
 
                 // * check
-                // console.log("upload success");
-                console.log(response);
+                console.log("upload success");
+                // console.log(response);
 
                 // ? alert msg
                 Swal.fire({
@@ -784,10 +1179,9 @@ window.onload = () => {
                 );
             },
         })
-    })
-};
+    });
 
-
+}
 
 function stringToArr(string) {
 
