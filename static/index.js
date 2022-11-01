@@ -1116,6 +1116,8 @@ window.onload = () => {
                     && obj.province === other.province
                     && obj.brand === other.brand
                     && obj.color === other.color
+                    && obj.type === other.type
+                    && obj.img === other.img
             ));
         console.log(remove_dup);
 
