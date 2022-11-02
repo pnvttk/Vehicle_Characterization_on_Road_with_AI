@@ -59,11 +59,15 @@
 {% block content %}
 <div class="container py-4">
     <h1 class="display-5 fw-bold">Object Detection</h1>
-    <p class="col-md-8 fs-4">Upload image to use custom model of Yolov5 model.</p>
+    <p class="col-md-8 fs-4">Upload image to use our custom model of Yolov5.</p>
     <div class="row align-items-md-stretch">
         <div class="col-md-6">
             <div class="h-100 p-5 bg-light border rounded-3">
-                <h2>Detect from a image.</h2>
+                <h2>Detect from images.</h2>
+                <p>Support an image or multiple image at once. But not recommends too many images and too much large
+                    file size.
+                </p>
+                <p>* Support .jpg, .png, .jpeg only</p>
                 <form id="form-files" method="post" enctype=multipart/form-data>
                     <div class="input-group mt-3">
                         <input type="file" class="form-control" id="imageinput" type="file" name="image" multiple>

@@ -354,7 +354,7 @@ window.onload = () => {
                                 p_elm = document.createElement("p")
 
                                 // ? set text inside
-                                p_elm.innerHTML = "Car " + count + " :"
+                                // p_elm.innerHTML = "Car " + count + " :"
 
                                 // ? append p element to id input_box
                                 div_car_img.append(p_elm)
