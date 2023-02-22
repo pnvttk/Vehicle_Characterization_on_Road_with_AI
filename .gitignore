@@ -3,7 +3,7 @@
 /__pycache__/*
 **/yolov5/**
 /yolov5/*
-# /models_train/*
+/models_train/*
 /results/*
 .vercel
 .venv
