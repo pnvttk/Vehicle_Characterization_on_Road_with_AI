@@ -4,7 +4,6 @@ Watch this video to see how it work: [link](https://youtu.be/NaVDRdXCfqc)
 
 # pip install
 install requirements.text
-install flask
 
 # Clone Yolov5
 ## Set path yolov5 in app.py
