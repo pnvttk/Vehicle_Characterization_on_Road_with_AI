@@ -84,7 +84,7 @@ app.config['results_folder'] = results_folder
 
 # ? Local custom model
 model = torch.hub.load('./yolov5', 'custom', source='local',
-                       path='./models_train/yolov5m.pt', force_reload=True)  # The repo is stored locally
+                       path='./models_train/yolov5s.pt', force_reload=True)  # The repo is stored locally
 # ? all classname
 classes = model.names  # class names in string format
 # ? confidence threshold
