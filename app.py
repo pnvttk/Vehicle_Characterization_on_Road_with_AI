@@ -25,17 +25,17 @@ from optparse import Values
 from urllib import response
 from sqlite3 import IntegrityError
 from ast import literal_eval
-from asyncio.windows_events import NULL
+# from asyncio.windows_events import NULL # work on windows only
 from distutils.command.upload import upload
 from itertools import count
 from datetime import datetime, timezone, timedelta
 from email.mime import image
 from enum import unique
 from operator import contains, ne
-from tkinter import BOTTOM
-from tkinter.tix import Tree
+# from tkinter import BOTTOM
+# from tkinter.tix import Tree
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from turtle import title
+# from turtle import title
 from unittest import result
 from PIL import Image
 from io import BytesIO
@@ -65,21 +65,21 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['results_folder'] = results_folder
 
 
-# ? MySQL setup
-conn = pymysql.connect(host='localhost',
-                       user='root',
-                       passwd='',
-                       db='flask'
-                       #    cursorclass=pymysql.cursors.DictCursor
-                       )
-# ? Freedb MySQL
-# conn = pymysql.connect(host='sql.freedb.tech',
-#                        user='freedb_pnvttk',
-#                        passwd='d5*cJtFdQXSUkcQ',
-#                        db='freedb_pnvttk_flask',
-#                        port=3306
+# # ? MySQL setup
+# conn = pymysql.connect(host='localhost',
+#                        user='root',
+#                        passwd='',
+#                        db='flask'
 #                        #    cursorclass=pymysql.cursors.DictCursor
 #                        )
+# # ? Freedb MySQL
+# # conn = pymysql.connect(host='sql.freedb.tech',
+# #                        user='freedb_pnvttk',
+# #                        passwd='d5*cJtFdQXSUkcQ',
+# #                        db='freedb_pnvttk_flask',
+# #                        port=3306
+# #                        #    cursorclass=pymysql.cursors.DictCursor
+# #                        )
 
 
 # ? Local custom model
@@ -116,7 +116,7 @@ def fuzzy(string):
     if fuzzy_sort_conf >= 80:
         return fuzzy_sort
     else:
-        fuzzy_text = NULL
+        fuzzy_text = None
         return fuzzy_text
 
 
@@ -282,7 +282,7 @@ def mask_image():
                                 # ? fuzzy text looking for similiar from province_th
                                 fuzzytxt = fuzzy(re_txt)
 
-                                if fuzzytxt == NULL:
+                                if fuzzytxt == None:
                                     print(
                                         "[INFO] Sorting Text for (" + str(txt) + ") : ")
                                     print(fuzzytxt)
@@ -412,20 +412,22 @@ def sendtoDB():
             # ? pass to variable
             upload_date = date_time
 
-            # ? try catch when commit to database
-            try:
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                               (plate, province, brand, car_type, color, upload_date, image_uploda))
-                conn.commit()
-                print("=======")
-                print("success")
-                print("=======")
+            # ! uncomment when db isset
+            # # ? try catch when commit to database
+            # try:
+            #     cursor = conn.cursor()
+            #     cursor.execute("INSERT INTO detect_data (plate, province, brand, type, color, upload_date, image) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            #                    (plate, province, brand, car_type, color, upload_date, image_uploda))
+            #     conn.commit()
+            #     print("=======")
+            #     print("success")
+            #     print("=======")
 
-            except pymysql.IntegrityError:
-                print("=======")
-                print("failed")
-                print("=======")
+            # except pymysql.IntegrityError:
+            #     print("=======")
+            #     print("failed")
+            #     print("=======")
+            # !
 
     commit_status = True
 
@@ -453,34 +455,36 @@ def index():
     return render_template('index.html')
 
 
-# # ? datatables
-@app.route("/api/table", methods=['POST'])
-def api_table():
-    if request.method == 'POST':
-        cur = conn.cursor()
-        cur.execute('select * from detect_data')
-        tb_detect_data = cur.fetchall()
+# ! uncomment when db is set
+# # # ? datatables
+# @app.route("/api/table", methods=['POST'])
+# def api_table():
+#     if request.method == 'POST':
+#         cur = conn.cursor()
+#         cur.execute('select * from detect_data')
+#         tb_detect_data = cur.fetchall()
 
-        data = []
-        for row in tb_detect_data:
-            data.append({
-                'id': row[0],
-                'plate': row[1],
-                'province': row[2],
-                'brand': row[3],
-                'type': row[4],
-                'color': row[5],
-                'upload_date': row[6],
-                'image': row[7]
-            })
+#         data = []
+#         for row in tb_detect_data:
+#             data.append({
+#                 'id': row[0],
+#                 'plate': row[1],
+#                 'province': row[2],
+#                 'brand': row[3],
+#                 'type': row[4],
+#                 'color': row[5],
+#                 'upload_date': row[6],
+#                 'image': row[7]
+#             })
 
-        response = {
-            'aaData': data
-        }
+#         response = {
+#             'aaData': data
+#         }
 
-        return jsonify(response)
-    else:
-        return jsonify({'status': 'failed'})
+#         return jsonify(response)
+#     else:
+#         return jsonify({'status': 'failed'})
+# !
 
 
 # # ? datatable path
@@ -515,30 +519,31 @@ def Convert(string):
 # # Chart
 
 
-@ app.route("/chart", methods=['GET', 'POST'])
-def chart():
+# ! uncomment when db is set
+# @ app.route("/chart", methods=['GET', 'POST'])
+# def chart():
 
-    cur = conn.cursor()
-    cur.execute('SELECT brand_name FROM `brand`;')  # get brand for chart
-    brand_data = [item[0] for item in cur.fetchall()]  # get brand for chart
+#     cur = conn.cursor()
+#     cur.execute('SELECT brand_name FROM `brand`;')  # get brand for chart
+#     brand_data = [item[0] for item in cur.fetchall()]  # get brand for chart
 
-    # COUNT brand for chart
-    cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;')
-    tb_detect_data1 = [cur.fetchall()]  # COUNT brand for chart
+#     # COUNT brand for chart
+#     cur.execute('SELECT COUNT(detect_data.brand) FROM brand LEFT JOIN detect_data on brand.brand_name = detect_data.brand GROUP BY brand.brand_name ORDER BY brand_id;')
+#     tb_detect_data1 = [cur.fetchall()]  # COUNT brand for chart
 
-    # convert a tuple to string
-    tuple_to_str = convertTuple(tb_detect_data1)
+#     # convert a tuple to string
+#     tuple_to_str = convertTuple(tb_detect_data1)
 
-    # ลบ , ()
-    re_str = re.compile('[,()]')
-    re_str2 = re_str.sub('', str(tuple_to_str))
+#     # ลบ , ()
+#     re_str = re.compile('[,()]')
+#     re_str2 = re_str.sub('', str(tuple_to_str))
 
-    # convert a string to list
-    str_to_list = (Convert(re_str2))
-    new_list = [item.strip("'") for item in str_to_list]  # ลบ '
+#     # convert a string to list
+#     str_to_list = (Convert(re_str2))
+#     new_list = [item.strip("'") for item in str_to_list]  # ลบ '
 
-    return render_template('chart.html', brand_data=brand_data, new_list=new_list)
-
+#     return render_template('chart.html', brand_data=brand_data, new_list=new_list)
+# !
 
 # ? server and port setup
 if __name__ == "__main__":
