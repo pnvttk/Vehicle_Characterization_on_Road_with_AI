@@ -1,19 +1,17 @@
 # [DEMO HERE](https://youtu.be/NaVDRdXCfqc)
 
 
-# ai-plate-detection
-
+# How to set up
 ## pip install
-install requirements.text
-
-## Clone Yolov5
-
-### Set path yolov5 in app.py
+```
+pip install -r requirements.text
+```
+## Clone Yolov5 and set path yolov5 in app.py
 ```
 git clone https://github.com/ultralytics/yolov5.git
 ```
-
-## Custom model path
+## Custom model path to weight in app.py
+```
 /models_train/best.pt
-## Set path to weight in app.py
+```
 
